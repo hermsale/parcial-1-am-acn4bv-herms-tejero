@@ -1,9 +1,28 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Parcial_1" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.Parcial_1" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Colores clave -->
+        <item name="colorPrimary">@color/brand_brown</item>
+        <item name="colorPrimaryContainer">@color/brand_brown_dark</item>
+        <item name="colorSecondary">@color/brand_orange</item>
+        <item name="colorSecondaryContainer">@color/brand_orange_dark</item>
+        <item name="android:statusBarColor">@color/brand_brown_dark</item>
+        <item name="android:navigationBarColor">@color/brand_brown</item>
+        <item name="android:colorBackground">@color/brand_background</item>
+
+        <!-- Texto por defecto -->
+        <item name="android:textColor">@color/brand_text_primary</item>
+
+        <!-- Botones Material por defecto -->
+        <item name="materialButtonStyle">@style/Widget.Parcial1.BrandButton</item>
     </style>
 
-    <style name="Theme.Parcial_1" parent="Base.Theme.Parcial_1" />
+    <!-- Estilo de botones naranja -->
+    <style name="Widget.Parcial1.BrandButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/brand_orange</item>
+        <item name="rippleColor">@color/brand_orange_dark</item>
+        <item name="android:textColor">@color/brand_text_on_primary</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
 </resources>
