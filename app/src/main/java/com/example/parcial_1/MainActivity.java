@@ -12,6 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.parcial_1.data.CartStore;
+import com.example.parcial_1.model.CartItem;
+import com.example.parcial_1.model.Category;
+import com.example.parcial_1.model.Product;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.NumberFormat;
@@ -21,31 +25,17 @@ import java.util.Locale;
 
 /**
  * MainActivity - Catálogo + Carrito (resumen arriba)
- *
- * Qué hace:
- * - Carga un catálogo mock (sin backend) y lo muestra a ancho completo.
- * - Permite filtrar por categoría y agregar productos al carrito.
- * - Muestra el carrito en la parte superior con cantidad total de ítems y total en $ ARS.
- * - Botón "Ver carrito" para ir a CartActivity (pantalla de detalle).
- *
- * Ciclo de vida / hilo:
- * - Toda la inicialización se realiza en onCreate() (hilo UI).
  */
 public class MainActivity extends AppCompatActivity {
 
-    // Vistas (catálogo y resumen de carrito)
     private LinearLayout llCatalogContainer;
     private TextView tvTotal;
     private TextView tvCartCount;
 
-    // Filtros / acciones
     private MaterialButton btnAll, btnPrint, btnBinding;
     private MaterialButton btnClearCart, btnViewCart;
 
-    // Datos en memoria (MVP sin backend)
     private final List<Product> allProducts = new ArrayList<>();
-    private final List<CartItem> cart = new ArrayList<>();
-
     private LayoutInflater inflater;
     private final NumberFormat ars = NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
 
@@ -54,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Toolbar con logo/títulos (reutilizable)
         Toolbar toolbar = findViewById(R.id.appToolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
@@ -67,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Referencias a vistas
         inflater = LayoutInflater.from(this);
         llCatalogContainer = findViewById(R.id.llCatalogContainer);
         tvTotal = findViewById(R.id.tvTotal);
@@ -79,30 +67,23 @@ public class MainActivity extends AppCompatActivity {
         btnClearCart = findViewById(R.id.btnClearCart);
         btnViewCart = findViewById(R.id.btnViewCart);
 
-        // 1) Datos mock realistas
         seedMockData();
-
-        // 2) Render catálogo inicial (Todos)
         renderCatalog(allProducts);
 
-        // 3) Listeners de filtros
         btnAll.setOnClickListener(v -> renderCatalog(allProducts));
-
         btnPrint.setOnClickListener(v -> {
             List<Product> filtered = new ArrayList<>();
             for (Product p : allProducts) if (p.category == Category.PRINT) filtered.add(p);
             renderCatalog(filtered);
         });
-
         btnBinding.setOnClickListener(v -> {
             List<Product> filtered = new ArrayList<>();
             for (Product p : allProducts) if (p.category == Category.BINDING) filtered.add(p);
             renderCatalog(filtered);
         });
 
-        // 4) Acciones de carrito
         btnClearCart.setOnClickListener(v -> {
-            cart.clear();
+            CartStore.get().clear();
             updateCartUi();
         });
 
@@ -110,39 +91,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, CartActivity.class))
         );
 
-        // Estado inicial
         updateCartUi();
     }
 
-    /** Carga productos de ejemplo (sin backend). */
     private void seedMockData() {
         allProducts.add(new Product(
-                "Impresión B/N",
-                "Cara simple · A4",
-                100,
-                Category.PRINT,
-                R.drawable.sample_print_bw
+                "Impresión B/N", "Cara simple · A4", 100,
+                Category.PRINT, R.drawable.sample_print_bw, /*copyBased*/ true
         ));
         allProducts.add(new Product(
-                "Impresión color",
-                "Doble cara · A4",
-                200,
-                Category.PRINT,
-                R.drawable.sample_print_color
+                "Impresión color", "Doble cara · A4", 200,
+                Category.PRINT, R.drawable.sample_print_color, /*copyBased*/ true
         ));
         allProducts.add(new Product(
-                "Anillado A4",
-                "Tapa plástica + contratapa",
-                800,
-                Category.BINDING,
-                R.drawable.sample_binding
+                "Anillado A4", "Tapa plástica + contratapa", 800,
+                Category.BINDING, R.drawable.sample_binding, /*copyBased*/ false
         ));
     }
 
-    /**
-     * Renderiza el catálogo a partir de una lista.
-     * Limpia el contenedor y crea un item por producto inflando R.layout.item_catalog.
-     */
     private void renderCatalog(List<Product> list) {
         llCatalogContainer.removeAllViews();
         for (Product p : list) {
@@ -157,69 +123,21 @@ public class MainActivity extends AppCompatActivity {
             iv.setImageResource(p.imageRes);
             tvName.setText(p.name);
             tvDesc.setText(p.desc);
-            tvPrice.setText(ars.format(p.price)); // precio $ ARS formateado
+            tvPrice.setText(ars.format(p.price));
 
-            // Agregar al carrito
-            btnAdd.setOnClickListener(v -> addToCart(p));
+            btnAdd.setOnClickListener(v -> {
+                CartStore.get().add(p);
+                updateCartUi();
+            });
 
             llCatalogContainer.addView(item);
         }
     }
 
-    /** Agrega un producto al carrito; si ya está, incrementa cantidad. */
-    private void addToCart(Product p) {
-        CartItem existing = null;
-        for (CartItem ci : cart) {
-            if (ci.product.name.equals(p.name)) { // clave simple por nombre (suficiente para MVP)
-                existing = ci;
-                break;
-            }
-        }
-        if (existing == null) {
-            cart.add(new CartItem(p, 1));
-        } else {
-            existing.qty++;
-        }
-        updateCartUi();
-    }
-
-    /** Recalcula cantidad y total del carrito y los pinta en el resumen superior. */
     private void updateCartUi() {
-        int items = 0;
-        int total = 0;
-        for (CartItem ci : cart) {
-            items += ci.qty;
-            total += ci.qty * ci.product.price;
-        }
-        tvCartCount.setText(getString(R.string.cart_items_format, items)); // "(N ítems)"
-        tvTotal.setText(ars.format(total)); // "$ X.XXX,XX"
-    }
-
-    // ----------------- Modelos en memoria (MVP) -----------------
-
-    enum Category { PRINT, BINDING }
-
-    static class Product {
-        final String name;
-        final String desc;
-        final int price;
-        final Category category;
-        final int imageRes;
-        Product(String name, String desc, int price, Category category, int imageRes) {
-            this.name = name;
-            this.desc = desc;
-            this.price = price;
-            this.category = category;
-            this.imageRes = imageRes;
-        }
-    }
-
-    static class CartItem {
-        final Product product;
-        int qty;
-        CartItem(Product product, int qty) {
-            this.product = product;
-            this.qty = qty;
-        }
+        int items = CartStore.get().getTotalQty();
+        int total = CartStore.get().getTotalAmount();
+        tvCartCount.setText(getString(R.string.cart_items_format, items));
+        tvTotal.setText(ars.format(total));
     }
 }
