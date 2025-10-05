@@ -5,7 +5,9 @@
     android:orientation="horizontal"
     android:padding="@dimen/spacing_sm"
     android:layout_marginBottom="@dimen/spacing_xs"
-    android:background="@drawable/bg_item">
+    android:background="@drawable/bg_item"
+    android:gravity="center_vertical"
+    android:baselineAligned="false">
 
     <!-- Miniatura del producto -->
     <ImageView
@@ -25,24 +27,28 @@
 
         <TextView
             android:id="@+id/tvName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Impresión B/N"
             android:textStyle="bold"
-            android:textColor="@color/brand_text_primary" />
+            android:textColor="@color/brand_text_primary"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="$100"
-            android:textColor="@color/brand_text_primary" />
+            android:textColor="@color/brand_text_primary"
+            android:singleLine="true" />
     </LinearLayout>
 
-    <!-- Acción -->
+    <!-- Acción (con ancho mínimo para que no aplaste el texto) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minWidth="96dp"
         android:text="@string/add"/>
 </LinearLayout>
