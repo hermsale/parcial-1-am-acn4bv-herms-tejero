@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: bg_item.xml
+ Ubicación: app/src/main/res/drawable/
+
+ ¿De qué se encarga este archivo?
+   - Define el fondo visual para ítems secundarios o de menor jerarquía,
+     por ejemplo: líneas del carrito, listas, o contenedores de texto
+     complementarios dentro de la app "La Montaña".
+
+ Contenido y función:
+   - Es un recurso <shape> simple que pinta un rectángulo con esquinas
+     redondeadas y un color de fondo "muted" (suave o neutro).
+   - Se utiliza cuando se busca una diferenciación visual sutil respecto
+     a las tarjetas principales (bg_card.xml).
+
+ Atributos principales:
+   - <solid>: color base del fondo (referencia @color/muted).
+   - <corners>: radio de las esquinas definido en @dimen/radius_md.
+
+ Relación con las vistas:
+   - Usado en contenedores de ítems dentro de listas, por ejemplo en
+     item_cart.xml o item_summary.xml, para dar contraste con la tarjeta
+     principal sin destacar demasiado.
+ =============================================================
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Color de fondo suave o neutro para ítems secundarios -->
     <solid android:color="@color/muted"/>
+
+    <!-- Esquinas redondeadas coherentes con el resto de la UI -->
     <corners android:radius="@dimen/radius_md"/>
 </shape>
