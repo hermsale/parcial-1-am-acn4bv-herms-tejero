@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: bg_card.xml
+ Ubicación: app/src/main/res/drawable/
+
+ ¿De qué se encarga este archivo?
+   - Define el fondo (background) reutilizable para las tarjetas de productos,
+     items del carrito y secciones de la interfaz en la app "La Montaña".
+
+ Contenido y función:
+   - Es un recurso de tipo <shape> (forma dibujable) que genera un rectángulo
+     con esquinas redondeadas y color de fondo personalizado.
+   - Se usa como background en layouts o vistas (ej. ConstraintLayout, LinearLayout)
+     para dar apariencia consistente a tarjetas, botones o contenedores.
+
+ Atributos principales:
+   - <solid>: define el color de relleno del rectángulo (referencia @color/card).
+   - <corners>: aplica el radio de las esquinas (referencia @dimen/radius_md).
+
+ Relación con las vistas:
+   - Este drawable suele aplicarse en "item_catalog.xml" o "item_cart.xml"
+     para darles aspecto de tarjeta.
+   - Permite mantener la coherencia visual sin usar imágenes de fondo.
+
+ =============================================================
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Color de fondo de la tarjeta -->
     <solid android:color="@color/card"/>
+
+    <!-- Esquinas redondeadas según dimensión definida en res/values/dimens.xml -->
     <corners android:radius="@dimen/radius_md"/>
 </shape>
