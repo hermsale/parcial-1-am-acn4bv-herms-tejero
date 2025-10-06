@@ -1,27 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: themes.xml
+ Ubicación: app/src/main/res/values/
+
+ ¿De qué se encarga este archivo?
+   - Define los estilos y temas principales de la aplicación “La Montaña”.
+   - Centraliza los colores, tipografías y componentes base de la interfaz
+     bajo un tema derivado de Material Design 3 (Light, sin ActionBar).
+
+ Relación con las clases y vistas:
+   - Aplicado globalmente desde AndroidManifest.xml como el tema base de la app.
+   - Afecta todas las Activities y vistas (layouts) salvo que estas
+     definan un tema específico.
+   - Controla los colores del sistema (barra de estado, navegación) y
+     el estilo de los botones Material.
+
+ Estructura general:
+   1. Theme.Parcial_1 → tema raíz principal de la app.
+   2. Widget.Parcial1.BrandButton → estilo reutilizable de botón con
+      los colores de marca (naranja y marrón).
+
+ Diseño:
+   - Paleta cálida basada en marrón y naranja (identidad visual de La Montaña).
+   - Implementa coherencia visual entre botones, fondos y textos.
+   - Los nombres siguen el patrón: Theme.[Proyecto] y Widget.[Proyecto].[Componente].
+
+ =============================================================
+-->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ========================================================= -->
+    <!-- Tema principal de la aplicación -->
+    <!-- ========================================================= -->
     <style name="Theme.Parcial_1" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Colores clave -->
+        <!--
+            Colores de marca principales.
+            Se aplican a AppBar, botones, fondos y contenedores.
+        -->
         <item name="colorPrimary">@color/brand_brown</item>
         <item name="colorPrimaryContainer">@color/brand_brown_dark</item>
         <item name="colorSecondary">@color/brand_orange</item>
         <item name="colorSecondaryContainer">@color/brand_orange_dark</item>
+
+        <!--
+            Colores de sistema (barras superior e inferior).
+            Mantienen la coherencia con los tonos principales.
+        -->
         <item name="android:statusBarColor">@color/brand_brown_dark</item>
         <item name="android:navigationBarColor">@color/brand_brown</item>
         <item name="android:colorBackground">@color/brand_background</item>
 
-        <!-- Texto por defecto -->
+        <!--
+            Color de texto por defecto en toda la aplicación.
+            Usado cuando los TextView no definen color explícito.
+        -->
         <item name="android:textColor">@color/brand_text_primary</item>
 
-        <!-- Botones Material por defecto -->
+        <!--
+            Estilo global de botones Material.
+            Aplica por defecto a todos los <MaterialButton> de la app.
+        -->
         <item name="materialButtonStyle">@style/Widget.Parcial1.BrandButton</item>
     </style>
 
-    <!-- Estilo de botones naranja -->
+    <!-- ========================================================= -->
+    <!-- Estilo de botón personalizado (naranja de marca) -->
+    <!-- ========================================================= -->
     <style name="Widget.Parcial1.BrandButton" parent="Widget.Material3.Button">
+        <!-- Fondo principal del botón -->
         <item name="backgroundTint">@color/brand_orange</item>
+
+        <!-- Efecto de pulsación (ripple) -->
         <item name="rippleColor">@color/brand_orange_dark</item>
+
+        <!-- Texto del botón en color claro sobre fondo naranja -->
         <item name="android:textColor">@color/brand_text_on_primary</item>
+
+        <!-- Esquinas redondeadas -->
         <item name="cornerRadius">16dp</item>
     </style>
 
