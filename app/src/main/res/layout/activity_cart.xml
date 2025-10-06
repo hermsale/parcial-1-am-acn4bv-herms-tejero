@@ -36,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/spacing_sm" />
 
-    <!-- NUEVO: Realizar TODOS los pedidos -->
+    <!-- Realizar TODOS los pedidos -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPlaceAllOrders"
         android:layout_width="wrap_content"
