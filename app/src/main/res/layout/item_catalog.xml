@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+ =============================================================
+ Archivo: item_catalog.xml
+ Ubicación: app/src/main/res/layout/
+
+ ¿De qué se encarga este archivo?
+   - Define la vista individual de un producto dentro del catálogo principal
+     de la app “La Montaña”.
+   - Muestra la imagen, descripción y precio de cada producto/servicio,
+     junto con un botón para agregarlo al carrito.
+
+ Relación con las clases:
+   - Inflado dinámicamente por MainActivity.java dentro del contenedor
+     llCatalogContainer (activity_catalog.xml).
+   - El botón “Agregar” (btnAdd) ejecuta CartStore.get().add(product)
+     y actualiza el resumen del carrito en pantalla.
+
+ Estructura general:
+   1. Miniatura (imagen del producto).
+   2. Bloque de información textual (nombre, descripción, precio).
+   3. Botón de acción “Agregar”.
+
+ Diseño:
+   - Layout lineal horizontal, centrado verticalmente.
+   - Fondo con drawable @drawable/bg_item (color neutro con esquinas redondeadas).
+   - Uso de márgenes y paddings coherentes con la guía de estilo (@dimen).
+   - Compatible con scroll vertical dentro del catálogo principal.
+
+ =============================================================
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -9,7 +40,10 @@
     android:gravity="center_vertical"
     android:baselineAligned="false">
 
-    <!-- Miniatura -->
+    <!--
+        Imagen miniatura del producto o servicio.
+        Ejemplo: impresora, anillado, encuadernado, etc.
+    -->
     <ImageView
         android:id="@+id/ivThumb"
         android:layout_width="64dp"
@@ -17,7 +51,12 @@
         android:src="@drawable/sample_print_bw"
         android:contentDescription="@string/img_desc" />
 
-    <!-- Info -->
+    <!--
+        Bloque de información textual del producto:
+        - Nombre
+        - Descripción breve
+        - Precio unitario
+    -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -25,6 +64,7 @@
         android:orientation="vertical"
         android:paddingStart="@dimen/spacing_sm">
 
+        <!-- Nombre del producto -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
@@ -35,6 +75,7 @@
             android:singleLine="true"
             android:ellipsize="end" />
 
+        <!-- Descripción del producto -->
         <TextView
             android:id="@+id/tvDesc"
             android:layout_width="match_parent"
@@ -44,6 +85,7 @@
             android:maxLines="2"
             android:ellipsize="end" />
 
+        <!-- Precio del producto -->
         <TextView
             android:id="@+id/tvPrice"
             android:layout_width="match_parent"
@@ -54,11 +96,14 @@
             android:singleLine="true" />
     </LinearLayout>
 
-    <!-- Acción -->
+    <!--
+        Botón de acción que permite agregar el producto al carrito.
+        Se vincula al listener en MainActivity.renderCatalog().
+    -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="96dp"
-        android:text="@string/add"/>
+        android:text="@string/add" />
 </LinearLayout>
