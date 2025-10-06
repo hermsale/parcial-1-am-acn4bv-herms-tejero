@@ -35,6 +35,11 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="all_orders_done">Redireccionado a vista Pagos… (simulado)</string>
+    <string name="menu_open_menu">Menú</string>
+    <string name="menu_catalog">Catálogo</string>
+    <string name="menu_cart">Carrito</string>
+
+
 
 
 </resources>
