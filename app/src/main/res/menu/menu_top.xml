@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: menu_top.xml
+ Ubicación: app/src/main/res/menu/
+
+ ¿De qué se encarga este archivo?
+   - Define el **menú superior (toolbar menu)** que se muestra en la barra
+     superior (AppBar) de la app “La Montaña”.
+   - Contiene las acciones visibles del usuario, como abrir un menú
+     de navegación o mostrar opciones adicionales.
+
+ Relación con las clases:
+   - Se asocia automáticamente al layout include_app_bar.xml mediante el
+     atributo app:menu="@menu/menu_top".
+   - Los eventos de clic pueden manejarse desde:
+       ▪ onOptionsItemSelected(MenuItem item) en una Activity
+       ▪ o mediante listeners de Toolbar (setOnMenuItemClickListener).
+
+ Estructura general:
+   1. Un único ítem (action_nav) que muestra el ícono de menú hamburguesa.
+   2. El título se define en strings.xml y puede usarse como contentDescription.
+
+ Diseño:
+   - app:showAsAction="always" → fuerza la visibilidad del ícono en la AppBar.
+   - Usa un ícono vectorial blanco (@drawable/ic_menu) para coherencia visual.
+   - Puede ampliarse fácilmente con más opciones (por ejemplo, “Perfil” o “Configuración”).
+
+ =============================================================
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--
+        Elemento principal del menú superior.
+        Despliega o abre un menú lateral/contextual al presionarlo.
+    -->
     <item
         android:id="@+id/action_nav"
         android:title="@string/menu_open_menu"
