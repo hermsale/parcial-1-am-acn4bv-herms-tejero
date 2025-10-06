@@ -33,41 +33,38 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ========================================================= -->
-    <!-- Configuración principal de la aplicación -->
-    <!-- ========================================================= -->
     <application
-        android:allowBackup="true"                         <!-- Permite backups automáticos -->
-    android:dataExtractionRules="@xml/data_extraction_rules"  <!-- Reglas para extracción de datos -->
-    android:fullBackupContent="@xml/backup_rules"       <!-- Configura qué incluir/excluir en backups -->
-    android:icon="@mipmap/ic_launcher"                  <!-- Ícono principal -->
-    android:label="@string/app_name"                    <!-- Nombre mostrado en el sistema -->
-    android:roundIcon="@mipmap/ic_launcher_round"       <!-- Ícono redondo alternativo -->
-    android:supportsRtl="true"                          <!-- Soporte para idiomas RTL -->
-    android:theme="@style/Theme.Parcial_1">             <!-- Tema global definido en themes.xml -->
+            android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Parcial_1">
 
-    <!-- ========================================================= -->
-    <!-- Activity principal: Catálogo -->
-    <!-- ========================================================= -->
-    <activity
-        android:name=".MainActivity"
-        android:exported="true"> <!-- Obligatorio en Android 12+ -->
+        <!-- ========================================================= -->
+        <!-- Activity principal: Catálogo -->
+        <!-- ========================================================= -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"> <!-- Obligatorio en Android 12+ -->
 
-        <!--
-            Filtro de intención:
-            - Marca esta Activity como el punto de entrada de la app.
-            - Se ejecuta al iniciar desde el lanzador (Launcher).
-        -->
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+            <!--
+                Filtro de intención:
+                - Marca esta Activity como el punto de entrada de la app.
+                - Se ejecuta al iniciar desde el lanzador (Launcher).
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    <!-- ========================================================= -->
-    <!-- Segunda Activity: Carrito de compras -->
-    <!-- ========================================================= -->
-    <activity android:name=".CartActivity" />
+        <!-- ========================================================= -->
+        <!-- Segunda Activity: Carrito de compras -->
+        <!-- ========================================================= -->
+        <activity android:name=".CartActivity" />
+    </application>
+</manifest>
 
-</application>
-    </manifest>

@@ -79,7 +79,6 @@
     <string name="unit_price_format">%1$s (unitario)</string>
     <string name="cart_total_label_format">Total: %1$s</string>
     <string name="item_total_format">Total ítem: %1$s</string>
-    <string name="cart_items_format">(%1$d ítems)</string>
 
     <!-- ========================================================= -->
     <!-- Diálogos de confirmación -->
