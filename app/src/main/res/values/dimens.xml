@@ -1,18 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: dimens.xml
+ Ubicación: app/src/main/res/values/
+
+ ¿De qué se encarga este archivo?
+   - Define todas las **dimensiones reutilizables** del proyecto “La Montaña”.
+   - Incluye espaciados (márgenes y paddings), tamaños de texto y radios
+     de esquinas, asegurando coherencia visual y escalabilidad en la UI.
+
+ Relación con las vistas:
+   - Utilizado en todos los layouts XML (por ejemplo, activity_catalog.xml,
+     activity_cart.xml, item_catalog.xml, etc.).
+   - Permite mantener una jerarquía visual consistente y fácilmente
+     adaptable a pantallas de distintas densidades (dp/sp).
+
+ Estructura general:
+   1. Espaciados (spacing_xs → spacing_lg): unidades base para márgenes y paddings.
+   2. Tamaños de texto (text_md → text_xl): tipografía escalonada.
+   3. Radios (radius_md): redondeo de tarjetas y botones.
+   4. Espaciados alternativos (space_8, space_12, etc.) para compatibilidad o ajustes finos.
+
+ Buenas prácticas:
+   - Usar siempre estas referencias en lugar de valores fijos (dp/sp).
+   - Aumenta la mantenibilidad y facilita la adaptación del diseño a distintos dispositivos.
+
+ =============================================================
+-->
 <resources>
-    <dimen name="spacing_xs">4dp</dimen>
-    <dimen name="spacing_sm">8dp</dimen>
-    <dimen name="spacing_md">16dp</dimen>
-    <dimen name="spacing_lg">24dp</dimen>
 
-    <dimen name="text_md">16sp</dimen>
-    <dimen name="text_lg">18sp</dimen>
-    <dimen name="text_xl">22sp</dimen>
+    <!-- ========================================================= -->
+    <!-- Espaciados principales (márgenes y paddings) -->
+    <!-- ========================================================= -->
+    <dimen name="spacing_xs">4dp</dimen>   <!-- Muy pequeño: entre íconos o textos -->
+    <dimen name="spacing_sm">8dp</dimen>   <!-- Pequeño: separación mínima entre elementos -->
+    <dimen name="spacing_md">16dp</dimen>  <!-- Medio: espaciado estándar -->
+    <dimen name="spacing_lg">24dp</dimen>  <!-- Grande: separación entre secciones -->
 
-    <dimen name="radius_md">12dp</dimen>
+    <!-- ========================================================= -->
+    <!-- Tamaños de texto -->
+    <!-- ========================================================= -->
+    <dimen name="text_md">16sp</dimen>     <!-- Texto base o cuerpo -->
+    <dimen name="text_lg">18sp</dimen>     <!-- Subtítulos o títulos secundarios -->
+    <dimen name="text_xl">22sp</dimen>     <!-- Títulos principales -->
 
-    <!-- Espaciados reutilizables -->
+    <!-- ========================================================= -->
+    <!-- Radios y bordes -->
+    <!-- ========================================================= -->
+    <dimen name="radius_md">12dp</dimen>   <!-- Radio medio para tarjetas o botones -->
+
+    <!-- ========================================================= -->
+    <!-- Espaciados alternativos / auxiliares -->
+    <!-- ========================================================= -->
+    <!-- Alias adicionales para componentes reutilizados -->
     <dimen name="space_8">8dp</dimen>
     <dimen name="space_12">12dp</dimen>
     <dimen name="space_16">16dp</dimen>
     <dimen name="space_24">24dp</dimen>
+
 </resources>
