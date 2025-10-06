@@ -6,7 +6,14 @@
     android:layout_height="?attr/actionBarSize"
     android:background="@color/brand_brown"
     android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
-    app:title="La Montaña"
-    app:subtitle="Impresiones"
-    app:titleCentered="true"
-    app:logo="@drawable/logo_lamontana" />
+    app:logo="@drawable/logo_lamontana"
+    app:title=""
+    app:menu="@menu/menu_top">
+
+    <!-- espacio para el PopupMenu (a la derecha) -->
+    <View
+        android:id="@+id/action_nav_anchor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="end" />
+</com.google.android.material.appbar.MaterialToolbar>
