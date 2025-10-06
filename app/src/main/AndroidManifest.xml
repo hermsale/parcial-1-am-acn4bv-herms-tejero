@@ -1,27 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: AndroidManifest.xml
+ Ubicación: app/src/main/
+
+ ¿De qué se encarga este archivo?
+   - Es el **archivo de manifiesto principal** de la aplicación “La Montaña”.
+   - Declara la estructura esencial del proyecto Android:
+       ▪ Nombre del paquete (definido en build.gradle).
+       ▪ Activities (pantallas) que conforman la app.
+       ▪ Recursos globales (tema, íconos, backups, etc.).
+       ▪ Permisos, componentes y configuraciones base.
+
+ Relación con las clases:
+   - Asocia las clases Java de Activities (MainActivity y CartActivity)
+     con el sistema Android.
+   - Define qué Activity actúa como punto de entrada (MAIN + LAUNCHER).
+
+ Diseño general:
+   1. Elemento raíz <manifest> → define espacio de nombres y nivel de permisos.
+   2. Nodo <application> → configuración global de la app.
+   3. Nodos <activity> → registro de cada pantalla.
+   4. Intent-filter → indica cuál es la pantalla inicial al abrir la app.
+
+ Buenas prácticas:
+   - Solo una Activity debe tener el filtro MAIN/LAUNCHER.
+   - El tema se aplica a nivel de aplicación, pero puede sobreescribirse por Activity.
+   - Mantener android:exported explícito (requerido desde Android 12+).
+
+ =============================================================
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ========================================================= -->
+    <!-- Configuración principal de la aplicación -->
+    <!-- ========================================================= -->
     <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Parcial_1">
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        android:allowBackup="true"                         <!-- Permite backups automáticos -->
+    android:dataExtractionRules="@xml/data_extraction_rules"  <!-- Reglas para extracción de datos -->
+    android:fullBackupContent="@xml/backup_rules"       <!-- Configura qué incluir/excluir en backups -->
+    android:icon="@mipmap/ic_launcher"                  <!-- Ícono principal -->
+    android:label="@string/app_name"                    <!-- Nombre mostrado en el sistema -->
+    android:roundIcon="@mipmap/ic_launcher_round"       <!-- Ícono redondo alternativo -->
+    android:supportsRtl="true"                          <!-- Soporte para idiomas RTL -->
+    android:theme="@style/Theme.Parcial_1">             <!-- Tema global definido en themes.xml -->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".CartActivity" />
+    <!-- ========================================================= -->
+    <!-- Activity principal: Catálogo -->
+    <!-- ========================================================= -->
+    <activity
+        android:name=".MainActivity"
+        android:exported="true"> <!-- Obligatorio en Android 12+ -->
 
-    </application>
+        <!--
+            Filtro de intención:
+            - Marca esta Activity como el punto de entrada de la app.
+            - Se ejecuta al iniciar desde el lanzador (Launcher).
+        -->
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 
-</manifest>
+    <!-- ========================================================= -->
+    <!-- Segunda Activity: Carrito de compras -->
+    <!-- ========================================================= -->
+    <activity android:name=".CartActivity" />
+
+</application>
+    </manifest>
