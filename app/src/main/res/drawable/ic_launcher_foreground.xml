@@ -1,10 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: ic_launcher_foreground.xml
+ Ubicación: app/src/main/res/drawable/
+
+ ¿De qué se encarga este archivo?
+   - Define el ícono **frontal (foreground)** de la aplicación “La Montaña”.
+   - Se superpone sobre el fondo definido en ic_launcher_background.xml
+     para formar el ícono completo mostrado en el launcher del sistema.
+
+ Contenido y función:
+   - Este vector dibuja una figura geométrica estilizada en color blanco
+     (la “M” abstracta característica del logo por defecto de Android Studio),
+     con un sombreado/gradiente que da sensación de profundidad.
+   - Se puede reemplazar o adaptar con el logotipo propio de la imprenta
+     en el futuro (por ejemplo, un ícono de montaña o impresora).
+
+ Estructura principal:
+   - <vector>: contenedor principal del gráfico vectorial.
+   - <path> (1): forma principal del fondo, con gradiente translúcido.
+   - <path> (2): figura central blanca que representa el ícono visible.
+
+ Relación con las vistas:
+   - No se utiliza directamente en layouts.
+   - Android lo combina con el recurso de fondo (ic_launcher_background.xml)
+     para generar el ícono completo que se muestra en el menú de apps.
+
+ =============================================================
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
+
+    <!--
+        Path 1: Sombra de fondo (gradiente lineal oscuro → transparente)
+        Da volumen a la parte inferior del ícono.
+    -->
+    <path
+        android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
         <aapt:attr name="android:fillColor">
             <gradient
                 android:endX="85.84757"
@@ -12,15 +48,16 @@
                 android:startX="42.9492"
                 android:startY="49.59793"
                 android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
+                <item android:color="#44000000" android:offset="0.0" />
+                <item android:color="#00000000" android:offset="1.0" />
             </gradient>
         </aapt:attr>
     </path>
+
+    <!--
+        Path 2: Figura principal blanca del ícono (forma de "M" estilizada).
+        Este elemento es el que realmente se ve sobre el fondo verde.
+    -->
     <path
         android:fillColor="#FFFFFF"
         android:fillType="nonZero"
