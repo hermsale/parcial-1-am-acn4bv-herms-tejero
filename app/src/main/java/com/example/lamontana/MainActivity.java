@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnClearCart, btnViewCart;
 
     // ---------- Soporte ----------
+
+//    array de productos
     private final List<Product> allProducts = new ArrayList<>();
     private LayoutInflater inflater;
     private final NumberFormat ars = NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
