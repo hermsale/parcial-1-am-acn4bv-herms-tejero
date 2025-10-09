@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import java.util.Iterator;
+
 /*
  * ============================================================
  * Archivo: CartStore.java
@@ -112,6 +114,19 @@ public class CartStore {
      */
     public synchronized void clear() {
         items.clear();
+    }
+
+//    elimina 1 item del carrito
+    public void remove(Product p) {
+        if (p == null) return;
+        Iterator<CartItem> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            CartItem item = iterator.next();
+            if (item.product != null && item.product.equals(p)) {
+                iterator.remove();
+                break;
+            }
+        }
     }
 
     /**

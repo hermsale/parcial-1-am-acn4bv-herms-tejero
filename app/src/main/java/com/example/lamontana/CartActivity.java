@@ -163,6 +163,9 @@ public class CartActivity extends AppCompatActivity {
             MaterialButton btnPlus = row.findViewById(R.id.btnPlus);
             MaterialButton btnUploadPdf = row.findViewById(R.id.btnDetectFromPdf);
             MaterialButton btnPlaceOrder = row.findViewById(R.id.btnPlaceOrder);
+//            boton para eliminar items
+            MaterialButton btnRemoveItem = row.findViewById(R.id.btnRemoveItem);
+
 
             Product p = ci.product;
             if (p == null) continue; // defensa
@@ -223,6 +226,21 @@ public class CartActivity extends AppCompatActivity {
                             .setTitle("Procesando pedido")
                             .setMessage("Redireccionado a vista Pagos… (simulado)")
                             .setPositiveButton(getString(R.string.ok), null)
+                            .show();
+                });
+            }
+
+            // eliminar producto del carrito
+            if (btnRemoveItem != null) {
+                btnRemoveItem.setOnClickListener(v -> {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Eliminar producto")
+                            .setMessage("¿Deseás quitar \"" + p.name + "\" del carrito?")
+                            .setPositiveButton("Eliminar", (dialog, which) -> {
+                                CartStore.get().remove(p); // elimina del carrito
+                                renderCart(); // repinta la vista
+                            })
+                            .setNegativeButton("Cancelar", null)
                             .show();
                 });
             }
