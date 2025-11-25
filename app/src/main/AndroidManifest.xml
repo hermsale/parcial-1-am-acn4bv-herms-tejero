@@ -61,6 +61,12 @@
             </intent-filter>
         </activity>
 
+        <!-- Activity Signup: Pantalla de registro -->
+        <activity
+            android:name=".ui.SignupActivity"
+            android:exported="false" />
+
+
         <!-- ========================================================= -->
         <!-- Activity principal anterior: Catálogo -->
         <!-- (Ya no es launcher, se abre tras el login) -->

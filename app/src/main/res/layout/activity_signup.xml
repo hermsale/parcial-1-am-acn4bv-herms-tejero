@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Archivo: activity_login.xml
+  Archivo: activity_signup.xml
   Ubicación: app/src/main/res/layout/
 
   Responsabilidad:
-    - Definir el diseño visual de la pantalla de inicio de sesión (Login).
-    - Contener los campos de email y contraseña, y el botón de iniciar sesión.
+    - Definir el diseño visual de la pantalla de creación de cuenta (Signup).
+    - Contener los campos necesarios para registrar un usuario nuevo.
+    - Formar parte del flujo inicial de autenticación del usuario.
 
   Alcance:
-    - Usado por LoginActivity como layout principal.
-    - Forma parte del flujo inicial de autenticación del usuario.
+    - Usado por SignupActivity como layout principal.
+    - Se integra con el backend de registro o lógica local según corresponda.
 
   Estructura visual:
     - ConstraintLayout como contenedor raíz.
     - Fondo general con color crema de la marca (@color/brand_background).
     - LinearLayout centrado con:
-        ▪ TextView para el título "Iniciar sesión".
+        ▪ TextView para el título "Crear cuenta".
+        ▪ EditText para nombre completo.
         ▪ EditText para email.
         ▪ EditText para contraseña.
-        ▪ Button para enviar el formulario de login.
+        ▪ EditText para confirmar contraseña.
+        ▪ Button para enviar la solicitud de creación de usuario.
 
   Relación con otros recursos:
     - Usa estilos definidos en styles.xml (LoginTitleText, LoginInputStyle, LoginButtonStyle).
@@ -27,7 +30,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rootLogin"
+    android:id="@+id/rootSignup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/brand_background"
@@ -35,7 +38,7 @@
 
     <!-- Contenedor principal del formulario -->
     <LinearLayout
-        android:id="@+id/loginContainer"
+        android:id="@+id/signupContainer"
         android:orientation="vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -48,15 +51,24 @@
 
         <!-- Título de la pantalla -->
         <TextView
-            android:id="@+id/tvLoginTitle"
+            android:id="@+id/tvSignupTitle"
             style="@style/LoginTitleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Iniciar sesión" />
+            android:text="Crear cuenta" />
+
+        <!-- Campo de nombre -->
+        <EditText
+            android:id="@+id/etName"
+            style="@style/LoginInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre completo"
+            android:inputType="textPersonName" />
 
         <!-- Campo de email -->
         <EditText
-            android:id="@+id/etEmail"
+            android:id="@+id/etSignupEmail"
             style="@style/LoginInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,31 +77,38 @@
 
         <!-- Campo de contraseña -->
         <EditText
-            android:id="@+id/etPassword"
+            android:id="@+id/etSignupPassword"
             style="@style/LoginInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Contraseña"
             android:inputType="textPassword" />
 
-        <!-- Botón de iniciar sesión -->
-        <Button
-            android:id="@+id/btnLogin"
-            style="@style/LoginButtonStyle"
+        <!-- Confirmar contraseña -->
+        <EditText
+            android:id="@+id/etSignupConfirmPassword"
+            style="@style/LoginInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ingresar" />
+            android:hint="Confirmar contraseña"
+            android:inputType="textPassword" />
 
-        <!-- Botón para ir a la pantalla de registro -->
+        <!-- Botón de crear cuenta -->
         <Button
-            android:id="@+id/btnGoToSignup"
-            style="@style/LoginSecondaryButtonStyle"
+            android:id="@+id/btnCreateAccount"
+            style="@style/LoginButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Crear cuenta" />
 
+        <!-- Botón de Volver para iniciar sesión -->
+        <Button
+            android:id="@+id/btnGoToLogin"
+            style="@style/LoginSecondaryButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver" />
+
     </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -52,6 +52,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btnLogin;
 
+//    este atributo lleva a la vista para crear cuenta
+    private Button btnGoToSignup;
+
     // -------------------------------------------------------------------------
     // Ciclo de vida
     // -------------------------------------------------------------------------
@@ -77,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);       // Debe existir @+id/etEmail en el XML
         etPassword = findViewById(R.id.etPassword); // Debe existir @+id/etPassword en el XML
         btnLogin = findViewById(R.id.btnLogin);     // Debe existir @+id/btnLogin en el XML
+        btnGoToSignup = findViewById(R.id.btnGoToSignup); // boton para ir a la pantalla de registro
     }
 
     /**
@@ -85,6 +89,15 @@ public class LoginActivity extends AppCompatActivity {
     private void setupListeners() {
         if (btnLogin != null) {
             btnLogin.setOnClickListener(view -> attemptLogin());
+        }
+
+
+        // Listener para ir al Signup
+        if (btnGoToSignup != null) {
+            btnGoToSignup.setOnClickListener(view -> {
+                Intent intent = new Intent(this, SignupActivity.class);
+                startActivity(intent);
+            });
         }
     }
 

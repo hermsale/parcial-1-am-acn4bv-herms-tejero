@@ -36,6 +36,17 @@
         <item name="android:layout_marginTop">8dp</item>
     </style>
 
+    <!-- Botón secundario para acciones como "Crear cuenta" en el Login -->
+    <style name="LoginSecondaryButtonStyle">
+        <item name="android:padding">12dp</item>
+        <!-- con lo siguiente. detengo el themes por defecto que pinta el boton -->
+        <item name="backgroundTint">@null</item>
+        <item name="android:background">@color/brand_orange_dark</item>
+        <item name="android:textColor">@color/text_white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:elevation">2dp</item>
+    </style>
 
 
 </resources>
