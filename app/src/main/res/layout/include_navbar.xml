@@ -1,0 +1,35 @@
+<!-- res/layout/include_navbar.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@color/brand_brown">
+
+
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/logo_lamontana"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Logo" />
+
+    <!-- SEPARADOR QUE EMPUJA A LA DERECHA -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+
+    <ImageView
+        android:id="@+id/btnMenu"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:contentDescription="Menu"
+        android:src="@drawable/ic_menu"
+        android:layout_marginEnd="16dp" />
+
+</LinearLayout>

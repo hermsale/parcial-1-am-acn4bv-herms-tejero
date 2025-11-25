@@ -109,7 +109,7 @@ public class CartActivity extends AppCompatActivity {
     private boolean onToolbarMenuClick(MenuItem item) {
         if (item.getItemId() == R.id.action_nav) {
             // Ancla del popup (si no existiera, caemos al toolbar)
-            View anchor = findViewById(R.id.action_nav_anchor);
+            View anchor = findViewById(R.id.action_nav);
             if (anchor == null) anchor = findViewById(R.id.appToolbar);
 
             PopupMenu pm = new PopupMenu(this, anchor);

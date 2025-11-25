@@ -46,12 +46,20 @@
         Barra superior reutilizable con logo y título.
         Incluye posibles iconos de menú o navegación.
     -->
+<!--    <include-->
+<!--        android:id="@+id/includeToolbar"-->
+<!--        layout="@layout/include_app_bar"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
+
     <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_app_bar"
+        android:id="@+id/navbar"
+        layout="@layout/include_navbar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
     <!--
         Panel superior del carrito:
@@ -66,7 +74,7 @@
         android:orientation="vertical"
         android:padding="@dimen/spacing_sm"
         android:background="@drawable/bg_card"
-        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
+        app:layout_constraintTop_toBottomOf="@+id/navbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -212,9 +220,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <!--
         Catálogo de productos scrolleable:

@@ -15,6 +15,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.Category;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.ui.LoginActivity;
+import com.example.lamontana.ui.SignupActivity;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.NumberFormat;
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnAll, btnPrint, btnBinding;
     private MaterialButton btnClearCart, btnViewCart;
 
+
     // ---------- Soporte ----------
 
 //    array de productos
@@ -79,18 +83,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalog);
 
-        // Toolbar de la pantalla (logo y títulos)
-        Toolbar toolbar = findViewById(R.id.appToolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setDisplayShowHomeEnabled(true);
-                getSupportActionBar().setLogo(R.drawable.logo_lamontana);
-                getSupportActionBar().setDisplayUseLogoEnabled(true);
-                getSupportActionBar().setTitle("La Montaña");
-                getSupportActionBar().setSubtitle("Impresiones");
-            }
-        }
+        ImageView btnMenu = findViewById(R.id.btnMenu);
+
+        btnMenu.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
+
+
+
+
+
 
         // Bind de vistas
         inflater = LayoutInflater.from(this);
