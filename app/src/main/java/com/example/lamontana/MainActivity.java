@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnAll, btnPrint, btnBinding;
     private MaterialButton btnClearCart, btnViewCart;
 
+//    atributos para el menu
+    private View overlay;
+    private View topSheet;
+    private boolean isMenuOpen = false;
+
 
     // ---------- Soporte ----------
 
@@ -85,15 +90,35 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView btnMenu = findViewById(R.id.btnMenu);
 
-        btnMenu.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
+//        menu navbar
+        overlay = findViewById(R.id.overlay);
+        topSheet = findViewById(R.id.topSheet);
+
+
+        // Abrir/cerrar menú al tocar el botón del navbar
+        btnMenu.setOnClickListener(v -> toggleMenu());
+
+        // Cerrar si tocás fuera del menú
+        overlay.setOnClickListener(v -> closeMenu());
+
+
+// Listener de opciones del menú
+        findViewById(R.id.btnMisDatos).setOnClickListener(v -> {
+            closeMenu();
+            // TODO: abrir pantalla de perfil cuando exista
+            // startActivity(new Intent(MainActivity.this, PerfilActivity.class));
         });
 
+        findViewById(R.id.btnMiCarrito).setOnClickListener(v -> {
+            closeMenu();
+            startActivity(new Intent(MainActivity.this, CartActivity.class));
+        });
 
-
-
-
+        findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
+            closeMenu();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        });
 
         // Bind de vistas
         inflater = LayoutInflater.from(this);
@@ -200,4 +225,34 @@ public class MainActivity extends AppCompatActivity {
         tvCartCount.setText(getString(R.string.cart_items_format, items));
         tvTotal.setText(ars.format(total));
     }
+
+
+    // ----- Control del menú deslizante (top sheet / navbar) -----
+
+    private void toggleMenu() {
+        if (isMenuOpen) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+
+    private void openMenu() {
+        topSheet.setVisibility(View.VISIBLE);
+        topSheet.startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(this, R.anim.top_sheet_down)
+        );
+        overlay.setVisibility(View.VISIBLE);
+        isMenuOpen = true;
+    }
+
+    private void closeMenu() {
+        topSheet.startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(this, R.anim.top_sheet_up)
+        );
+        overlay.setVisibility(View.GONE);
+        topSheet.setVisibility(View.GONE);
+        isMenuOpen = false;
+    }
+
 }

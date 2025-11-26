@@ -18,6 +18,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.ui.LoginActivity;
 import com.google.android.material.button.MaterialButton;
 
 
@@ -63,6 +64,11 @@ public class CartActivity extends AppCompatActivity {
     // Texto de total general ($)
     private TextView tvCartGrandTotal;
 
+    //    atributos para el menu
+    private View overlay;
+    private View topSheet;
+    private boolean isMenuOpen = false;
+
     // Formateador de moneda en ARS
     private final NumberFormat ars = NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
 
@@ -71,17 +77,39 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        // ---- Toolbar / AppBar (reutilizable) ----
-        Toolbar toolbar = findViewById(R.id.appToolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            if (getSupportActionBar() != null) {
-                // Dejamos el título vacío para posible “user chip” futuro
-                getSupportActionBar().setTitle("");
-            }
-            // Click del ícono hamburguesa (derecha) -> opciones
-            toolbar.setOnMenuItemClickListener(this::onToolbarMenuClick);
-        }
+
+
+        ImageView btnMenu = findViewById(R.id.btnMenu);
+
+//        menu navbar
+        overlay = findViewById(R.id.overlay);
+        topSheet = findViewById(R.id.topSheet);
+
+
+        // Abrir/cerrar menú al tocar el botón del navbar
+        btnMenu.setOnClickListener(v -> toggleMenu());
+
+        // Cerrar si tocás fuera del menú
+        overlay.setOnClickListener(v -> closeMenu());
+
+        // Listener de opciones del menú
+        findViewById(R.id.btnMisDatos).setOnClickListener(v -> {
+            closeMenu();
+            // TODO: abrir pantalla de perfil cuando exista
+            // startActivity(new Intent(MainActivity.this, PerfilActivity.class));
+        });
+
+        findViewById(R.id.btnMiCarrito).setOnClickListener(v -> {
+            closeMenu();
+            startActivity(new Intent(CartActivity.this, CartActivity.class));
+        });
+
+        findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
+            closeMenu();
+            startActivity(new Intent(CartActivity.this, LoginActivity.class));
+            finish();
+        });
+
 
         // ---- Referencias de UI ----
         llCartListContainer = findViewById(R.id.llCartListContainer);
@@ -338,5 +366,35 @@ public class CartActivity extends AppCompatActivity {
             }
         }
         return null;
+    }
+
+
+
+    // ----- Control del menú deslizante (top sheet / navbar) -----
+
+    private void toggleMenu() {
+        if (isMenuOpen) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+
+    private void openMenu() {
+        topSheet.setVisibility(View.VISIBLE);
+        topSheet.startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(this, R.anim.top_sheet_down)
+        );
+        overlay.setVisibility(View.VISIBLE);
+        isMenuOpen = true;
+    }
+
+    private void closeMenu() {
+        topSheet.startAnimation(
+                android.view.animation.AnimationUtils.loadAnimation(this, R.anim.top_sheet_up)
+        );
+        overlay.setVisibility(View.GONE);
+        topSheet.setVisibility(View.GONE);
+        isMenuOpen = false;
     }
 }
