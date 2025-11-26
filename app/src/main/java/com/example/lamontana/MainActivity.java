@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.Category;
 import com.example.lamontana.model.Product;
 import com.example.lamontana.ui.LoginActivity;
+import com.example.lamontana.ui.ProfileActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,39 +35,37 @@ import java.util.Locale;
  *  - Implementa la pantalla principal de Catálogo de la app "La Montaña".
  *  - Muestra productos/servicios, permite filtrarlos y agregarlos al carrito.
  *  - Presenta, en el panel superior, un resumen rápido del carrito (cantidad y total).
- *  - A partir de ahora, verifica que el usuario esté logueado con Firebase Auth
+ *  - Verifica que el usuario esté logueado con Firebase Auth
  *    antes de mostrar el catálogo.
+ *  - Controla el menú deslizante del navbar (top sheet) con opciones:
+ *      · Mis datos
+ *      · Mi carrito
+ *      · Cerrar sesión
  *
  * Clases declaradas:
- *  - MainActivity: Activity concreta (AppCompatActivity) que actúa como pantalla
- *    de Catálogo, protegida para usuarios autenticados.
+ *  - MainActivity: Activity concreta (AppCompatActivity) que actúa como
+ *    pantalla de Catálogo protegida para usuarios autenticados.
  *
- * Métodos y responsabilidades:
+ * Métodos presentes:
  *  - onCreate(Bundle):
- *      * Ciclo de vida.
- *      * Verifica que haya usuario logueado (ensureUserLoggedIn()).
- *      * Si no hay usuario → redirige a LoginActivity y termina.
- *      * Si hay usuario → infla el layout, configura la Toolbar, inicializa vistas,
- *        carga datos de ejemplo (seedMockData) y renderiza el catálogo completo.
+ *      * Verifica login (ensureUserLoggedIn()).
+ *      * Infla el layout, inicializa vistas y listeners.
+ *      * Configura el menú deslizante del navbar.
+ *      * Carga datos de ejemplo (seedMockData) y renderiza catálogo.
  *  - ensureUserLoggedIn():
- *      * Consulta FirebaseAuth para ver si hay un usuario autenticado.
- *      * Si no lo hay, redirige a LoginActivity y devuelve false.
- *      * Si lo hay, devuelve true.
+ *      * Consulta FirebaseAuth para ver si hay usuario autenticado.
  *  - seedMockData():
- *      * Crea un conjunto mínimo de productos de ejemplo para la demo sin backend.
+ *      * Crea productos de ejemplo para la demo.
  *  - renderCatalog(List<Product>):
- *      * Dibuja la lista de productos en el contenedor del catálogo e instala
- *        los listeners del botón "Agregar".
- *  - updateCartUi():
- *      * Actualiza el panel superior del carrito (cantidad y total) leyendo CartStore.
+ *      * Dibuja la lista de productos y vincula el botón "Agregar".
  *  - filterAndRender(Category):
  *      * Aplica un filtro por categoría y vuelve a renderizar.
- *
- * Relación con las vistas:
- *  - Vista Catálogo (activity_catalog.xml): esta Activity es su controlador.
- *    Maneja filtros y altas al carrito. Desde aquí se navega a CartActivity.
- *
- *  - Se asegura que solo usuarios autenticados (FirebaseAuth) puedan ver el catálogo.
+ *  - updateCartUi():
+ *      * Actualiza el panel superior del carrito (cantidad y total).
+ *  - toggleMenu(), openMenu(), closeMenu():
+ *      * Controlan la apertura/cierre del menú deslizante del navbar.
+ *  - onResume():
+ *      * Refresca el estado del carrito al volver a esta pantalla.
  * ============================================================
  */
 
@@ -79,36 +79,74 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnAll, btnPrint, btnBinding;
     private MaterialButton btnClearCart, btnViewCart;
 
+    // ----- Vistas para el menú deslizante (navbar) -----
+    private View overlay;
+    private View topSheet;
+    private boolean isMenuOpen = false;
+
     // ---------- Soporte ----------
     private final List<Product> allProducts = new ArrayList<>();
     private LayoutInflater inflater;
-    private final NumberFormat ars = NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
+    private final NumberFormat ars =
+            NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // 1) Verificar si el usuario está logueado en Firebase Auth.
-        //    Si no lo está, lo redirigimos al Login y no mostramos el catálogo.
+        //    Si no lo está, redirigimos a Login y no continuamos.
         if (!ensureUserLoggedIn()) {
-            // Si no hay usuario logueado, ya redirigimos y cerramos esta Activity.
-            // No continuamos con la inicialización de la UI.
             return;
         }
 
         setContentView(R.layout.activity_catalog);
 
+        // ---------- Navbar / Menú deslizante ----------
         ImageView btnMenu = findViewById(R.id.btnMenu);
+        overlay = findViewById(R.id.overlay);
+        topSheet = findViewById(R.id.topSheet);
+
         if (btnMenu != null) {
-            btnMenu.setOnClickListener(v -> {
-                // Por ahora este botón sigue llevando a la pantalla de Login.
-                // Podríamos convertirlo en "Cerrar sesión" en una mejora futura.
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
+            btnMenu.setOnClickListener(v -> toggleMenu());
+        }
+
+        if (overlay != null) {
+            overlay.setOnClickListener(v -> closeMenu());
+        }
+
+        // Botones dentro del top sheet (menú)
+        View btnMisDatos = findViewById(R.id.btnMisDatos);
+        View btnMiCarrito = findViewById(R.id.btnMiCarrito);
+        View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+
+        if (btnMisDatos != null) {
+            btnMisDatos.setOnClickListener(v -> {
+                closeMenu();
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             });
         }
 
-        // Bind de vistas
+        if (btnMiCarrito != null) {
+            btnMiCarrito.setOnClickListener(v -> {
+                closeMenu();
+                startActivity(new Intent(MainActivity.this, CartActivity.class));
+            });
+        }
+
+        if (btnCerrarSesion != null) {
+            btnCerrarSesion.setOnClickListener(v -> {
+                closeMenu();
+                // Cerrar sesión en Firebase y volver al login
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            });
+        }
+
+        // ---------- Bind de vistas del catálogo ----------
         inflater = LayoutInflater.from(this);
         llCatalogContainer = findViewById(R.id.llCatalogContainer);
         tvTotal = findViewById(R.id.tvTotal);
@@ -124,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         seedMockData();
         renderCatalog(allProducts);
 
-        // ---------- Listeners ----------
+        // ---------- Listeners de filtros y acciones de carrito ----------
         if (btnAll != null) {
             btnAll.setOnClickListener(v -> renderCatalog(allProducts));
         }
@@ -164,21 +202,17 @@ public class MainActivity extends AppCompatActivity {
     private boolean ensureUserLoggedIn() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
-            // No hay usuario autenticado: enviar a la pantalla de Login.
             Intent intent = new Intent(this, LoginActivity.class);
-            // Opcional: limpiar el back stack para evitar volver al catálogo sin login.
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
             return false;
         }
-        // Hay usuario logueado, se puede continuar.
         return true;
     }
 
     /**
-     * Crea productos de ejemplo para la demostración (no hay backend en esta etapa).
-     * Se incluyen productos con y sin "copyBased" (detección de páginas de PDF).
+     * Crea productos de ejemplo para la demostración.
      */
     private void seedMockData() {
         allProducts.add(new Product(
@@ -197,7 +231,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Renderiza la lista de productos (catálogo) en el contenedor vertical.
-     * Instala el click de "Agregar" para sumar al carrito y refrescar el panel superior.
      */
     private void renderCatalog(List<Product> list) {
         if (llCatalogContainer == null) return;
@@ -205,7 +238,8 @@ public class MainActivity extends AppCompatActivity {
         llCatalogContainer.removeAllViews();
 
         for (Product p : list) {
-            final View item = inflater.inflate(R.layout.item_catalog, llCatalogContainer, false);
+            final View item =
+                    inflater.inflate(R.layout.item_catalog, llCatalogContainer, false);
 
             ImageView iv = item.findViewById(R.id.ivThumb);
             TextView tvName = item.findViewById(R.id.tvName);
@@ -221,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
             if (btnAdd != null) {
                 btnAdd.setOnClickListener(v -> {
                     CartStore.get().add(p);
-                    updateCartUi(); // refresca badge y total del carrito en el panel superior
+                    updateCartUi();
                 });
             }
 
@@ -231,7 +265,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Aplica un filtro por categoría y vuelve a renderizar el catálogo.
-     * Evita duplicación de código en listeners de filtros.
      */
     private void filterAndRender(Category category) {
         List<Product> filtered = new ArrayList<>();
@@ -242,17 +275,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Actualiza el panel superior del carrito (cantidad y monto total) utilizando CartStore.
-     * Se invoca luego de cualquier cambio que afecte el carrito (agregar/vaciar, etc.).
+     * Actualiza el panel superior del carrito (cantidad y monto total).
      */
     private void updateCartUi() {
         int items = CartStore.get().getTotalQty();
         int total = CartStore.get().getTotalAmount();
+
         if (tvCartCount != null) {
             tvCartCount.setText(getString(R.string.cart_items_format, items));
         }
         if (tvTotal != null) {
             tvTotal.setText(ars.format(total));
         }
+    }
+
+    // ----- Control del menú deslizante (top sheet / navbar) -----
+
+    private void toggleMenu() {
+        if (isMenuOpen) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+
+    private void openMenu() {
+        if (topSheet == null || overlay == null) return;
+
+        topSheet.setVisibility(View.VISIBLE);
+        topSheet.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.top_sheet_down)
+        );
+        overlay.setVisibility(View.VISIBLE);
+        isMenuOpen = true;
+    }
+
+    private void closeMenu() {
+        if (topSheet == null || overlay == null) return;
+
+        topSheet.startAnimation(
+                AnimationUtils.loadAnimation(this, R.anim.top_sheet_up)
+        );
+        overlay.setVisibility(View.GONE);
+        topSheet.setVisibility(View.GONE);
+        isMenuOpen = false;
+    }
+
+    // Esto soluciona que, al volver desde el carrito, se actualice el resumen
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCartUi();
     }
 }
