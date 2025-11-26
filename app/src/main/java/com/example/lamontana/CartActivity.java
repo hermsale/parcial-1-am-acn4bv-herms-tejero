@@ -190,8 +190,7 @@ public class CartActivity extends AppCompatActivity {
             TextView tvQty = row.findViewById(R.id.tvQty);
             MaterialButton btnMinus = row.findViewById(R.id.btnMinus);
             MaterialButton btnPlus = row.findViewById(R.id.btnPlus);
-            MaterialButton btnUploadPdf = row.findViewById(R.id.btnDetectFromPdf);
-            MaterialButton btnPlaceOrder = row.findViewById(R.id.btnPlaceOrder);
+//            MaterialButton btnUploadPdf = row.findViewById(R.id.btnDetectFromPdf);
 //            boton para eliminar items
             MaterialButton btnRemoveItem = row.findViewById(R.id.btnRemoveItem);
 
@@ -226,38 +225,28 @@ public class CartActivity extends AppCompatActivity {
             }
 
             // Subida de PDF (solo si el producto es "copyBased")
-            if (btnUploadPdf != null) {
-                if (p.copyBased) {
-                    btnUploadPdf.setVisibility(View.VISIBLE);
-                    btnUploadPdf.setText(getString(R.string.upload_pdf));
-                    btnUploadPdf.setOnClickListener(v -> {
-                        // Simulación: archivo PDF con N hojas
-                        String fakeFileName = "Trabajo.pdf";
-                        int fakePages = 37;
-                        CartStore.get().setQty(p, fakePages);
-                        new AlertDialog.Builder(this)
-                                .setTitle("PDF cargado")
-                                .setMessage(fakeFileName + " (" + fakePages + " hojas)\nCantidad actualizada.")
-                                .setPositiveButton(getString(R.string.ok), null)
-                                .show();
-                        rebindRowAfterChange(row, p);
-                        updateGrandTotal();
-                    });
-                } else {
-                    btnUploadPdf.setVisibility(View.GONE);
-                }
-            }
+//            if (btnUploadPdf != null) {
+//                if (p.copyBased) {
+//                    btnUploadPdf.setVisibility(View.VISIBLE);
+//                    btnUploadPdf.setText(getString(R.string.upload_pdf));
+//                    btnUploadPdf.setOnClickListener(v -> {
+//                        // Simulación: archivo PDF con N hojas
+//                        String fakeFileName = "Trabajo.pdf";
+//                        int fakePages = 37;
+//                        CartStore.get().setQty(p, fakePages);
+//                        new AlertDialog.Builder(this)
+//                                .setTitle("PDF cargado")
+//                                .setMessage(fakeFileName + " (" + fakePages + " hojas)\nCantidad actualizada.")
+//                                .setPositiveButton(getString(R.string.ok), null)
+//                                .show();
+//                        rebindRowAfterChange(row, p);
+//                        updateGrandTotal();
+//                    });
+//                } else {
+//                    btnUploadPdf.setVisibility(View.GONE);
+//                }
+//            }
 
-            // Listener: realizar pedido (simulado por ítem)
-            if (btnPlaceOrder != null) {
-                btnPlaceOrder.setOnClickListener(v -> {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Procesando pedido")
-                            .setMessage("Redireccionado a vista Pagos… (simulado)")
-                            .setPositiveButton(getString(R.string.ok), null)
-                            .show();
-                });
-            }
 
             // eliminar producto del carrito
             if (btnRemoveItem != null) {

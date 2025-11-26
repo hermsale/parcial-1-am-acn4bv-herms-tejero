@@ -256,4 +256,10 @@ public class MainActivity extends AppCompatActivity {
         isMenuOpen = false;
     }
 
+//    Esto soluciona, cuando en el CartActivity se realiza el pedido. Al volver a la vista Main, se actualiza el carrito
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCartUi(); // refresca carrito siempre al volver a esta pantalla
+    }
 }

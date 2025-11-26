@@ -180,34 +180,34 @@
     <!-- ========================================================= -->
     <!-- FILA INFERIOR: Botones de acción (“Subir PDF” / “Realizar pedido”) -->
     <!-- ========================================================= -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="@dimen/spacing_sm">
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="end"-->
+<!--        android:layout_marginTop="@dimen/spacing_sm">-->
 
-        <!--
-            Botón opcional visible solo para productos “copyBased”
-            (detectan número de copias desde un archivo PDF).
-        -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDetectFromPdf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/upload_pdf"
-            android:visibility="gone"
-            android:layout_marginEnd="@dimen/spacing_sm" />
+<!--        &lt;!&ndash;-->
+<!--            Botón opcional visible solo para productos “copyBased”-->
+<!--            (detectan número de copias desde un archivo PDF).-->
+<!--        &ndash;&gt;-->
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/btnDetectFromPdf"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/upload_pdf"-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_marginEnd="@dimen/spacing_sm" />-->
 
-        <!--
-            Botón para confirmar el pedido del ítem actual.
-            Color verde de marca para acción principal.
-        -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPlaceOrder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/place_order"
-            android:backgroundTint="@color/brand_green" />
-    </LinearLayout>
+<!--        &lt;!&ndash;-->
+<!--            Botón para confirmar el pedido del ítem actual.-->
+<!--            Color verde de marca para acción principal.-->
+<!--        &ndash;&gt;-->
+<!--&lt;!&ndash;        <com.google.android.material.button.MaterialButton&ndash;&gt;-->
+<!--&lt;!&ndash;            android:id="@+id/btnPlaceOrder"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:text="@string/place_order"&ndash;&gt;-->
+<!--&lt;!&ndash;            android:backgroundTint="@color/brand_green" />&ndash;&gt;-->
+<!--    </LinearLayout>-->
 </LinearLayout>
