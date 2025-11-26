@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/topSheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="20dp"
+    android:elevation="10dp"
+    android:visibility="gone"
+  >
+
+    <TextView
+        android:id="@+id/btnInicio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Inicio"
+        android:textSize="18sp"
+        android:padding="12dp" />
+
+
+    <TextView
+        android:id="@+id/btnMisDatos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mis datos"
+        android:textSize="18sp"
+        android:padding="12dp" />
+
+    <TextView
+        android:id="@+id/btnMiCarrito"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mi carrito"
+        android:textSize="18sp"
+        android:padding="12dp" />
+
+    <TextView
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:textSize="18sp"
+        android:textColor="@android:color/holo_red_dark"
+        android:padding="12dp" />
+
+</LinearLayout>

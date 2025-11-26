@@ -18,8 +18,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.ui.LoginActivity;
 import com.google.android.material.button.MaterialButton;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -34,15 +36,23 @@ import java.util.Locale;
  *   - Controla la pantalla "Carrito". Muestra los ítems agregados,
  *     permite modificar cantidades (+/-), simular carga de PDF (copyBased),
  *     y realizar pedido(s) (simulado).
+ *   - A partir de ahora, también verifica que el usuario esté logueado con
+ *     Firebase Auth antes de mostrar el carrito.
  *
  * ¿Qué clases usa?
  *   - CartStore (data): singleton en memoria con el estado del carrito.
  *   - CartItem/Product (model): modelos de dominio que se renderizan en UI.
+ *   - FirebaseAuth/FirebaseUser: para comprobar que haya usuario autenticado.
  *
  * ¿Qué métodos principales tiene?
- *   - onCreate(): configura toolbar, listeners y dibuja el carrito (renderCart()).
+ *   - onCreate():
+ *       * Verifica que el usuario esté logueado (ensureUserLoggedIn()).
+ *       * Si no hay usuario -> redirige a LoginActivity y termina.
+ *       * Si hay usuario -> configura toolbar, listeners y dibuja el carrito.
+ *   - ensureUserLoggedIn():
+ *       * Consulta FirebaseAuth y, si no hay usuario, navega a LoginActivity.
  *   - renderCart(): infla dinámicamente filas (item_cart_detail) por cada CartItem.
- *   - rebindRowAfterChange(View, Product): refresca cantidad/total de una fila tras cambios.
+ *   - rebindRowAfterChange(View, Product): refresca cantidad/total de una fila.
  *   - updateGrandTotal(): recalcula total global y habilita/deshabilita acciones.
  *   - onPlaceAllOrders(): confirma “realizar todos” y limpia carrito (simulado).
  *   - onToolbarMenuClick(MenuItem): popup de navegación Catálogo/Carrito.
@@ -53,8 +63,10 @@ import java.util.Locale;
  *
  * Notas de implementación:
  *   - No hay backend; todo es en memoria.
+ *   - Se asegura que solo usuarios autenticados puedan ver el carrito.
  * ============================================================
  */
+
 public class CartActivity extends AppCompatActivity {
 
     // Contenedor vertical donde se agregan dinámicamente las filas del carrito
@@ -69,6 +81,13 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 1) Verificar si el usuario está logueado en Firebase Auth.
+        //    Si no lo está, redirigimos a LoginActivity y no mostramos el carrito.
+        if (!ensureUserLoggedIn()) {
+            return;
+        }
+
         setContentView(R.layout.activity_cart);
 
         // ---- Toolbar / AppBar (reutilizable) ----
@@ -100,6 +119,28 @@ public class CartActivity extends AppCompatActivity {
 
         // Primer render de la lista
         renderCart();
+    }
+
+    /**
+     * Verifica si hay un usuario logueado en FirebaseAuth.
+     * - Si NO hay usuario:
+     *     * Redirige a LoginActivity.
+     *     * Cierra esta Activity (finish()).
+     *     * Devuelve false para indicar que no se debe continuar.
+     * - Si hay usuario:
+     *     * Devuelve true y permite seguir con la configuración de la UI.
+     */
+    private boolean ensureUserLoggedIn() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // No hay usuario autenticado: enviar a la pantalla de Login.
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -145,7 +186,7 @@ public class CartActivity extends AppCompatActivity {
 
         llCartListContainer.removeAllViews();
 
-        List<CartItem> items = CartStore.get().getItems(); // copia inmutable (según implementación propuesta)
+        List<CartItem> items = CartStore.get().getItems();
         LayoutInflater inflater = LayoutInflater.from(this);
 
         for (CartItem ci : items) {
@@ -163,9 +204,8 @@ public class CartActivity extends AppCompatActivity {
             MaterialButton btnPlus = row.findViewById(R.id.btnPlus);
             MaterialButton btnUploadPdf = row.findViewById(R.id.btnDetectFromPdf);
             MaterialButton btnPlaceOrder = row.findViewById(R.id.btnPlaceOrder);
-//            boton para eliminar items
+            // Botón para eliminar items
             MaterialButton btnRemoveItem = row.findViewById(R.id.btnRemoveItem);
-
 
             Product p = ci.product;
             if (p == null) continue; // defensa

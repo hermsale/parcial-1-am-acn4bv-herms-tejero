@@ -71,7 +71,7 @@
     <string name="detect_from_pdf">Detectar desde PDF</string>
     <string name="place_order">Realizar pedido</string>
     <string name="upload_pdf">Subir PDF</string>
-    <string name="place_all_orders">Realizar todos</string>
+    <string name="place_all_orders">Realizar Pedido</string>
 
     <!-- ========================================================= -->
     <!-- Formatos dinámicos -->
