@@ -19,6 +19,7 @@ import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
 import com.example.lamontana.ui.LoginActivity;
+import com.example.lamontana.ui.ProfileActivity;
 import com.google.android.material.button.MaterialButton;
 
 
@@ -96,7 +97,7 @@ public class CartActivity extends AppCompatActivity {
         findViewById(R.id.btnMisDatos).setOnClickListener(v -> {
             closeMenu();
             // TODO: abrir pantalla de perfil cuando exista
-            // startActivity(new Intent(MainActivity.this, PerfilActivity.class));
+            startActivity(new Intent(CartActivity.this, ProfileActivity.class));
         });
 
         findViewById(R.id.btnMiCarrito).setOnClickListener(v -> {

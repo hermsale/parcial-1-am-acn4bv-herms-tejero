@@ -11,6 +11,15 @@
   >
 
     <TextView
+        android:id="@+id/btnInicio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Inicio"
+        android:textSize="18sp"
+        android:padding="12dp" />
+
+
+    <TextView
         android:id="@+id/btnMisDatos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

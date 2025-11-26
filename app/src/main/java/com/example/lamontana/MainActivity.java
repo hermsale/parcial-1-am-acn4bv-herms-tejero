@@ -16,6 +16,7 @@ import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.Category;
 import com.example.lamontana.model.Product;
 import com.example.lamontana.ui.LoginActivity;
+import com.example.lamontana.ui.ProfileActivity;
 import com.example.lamontana.ui.SignupActivity;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -90,23 +91,23 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView btnMenu = findViewById(R.id.btnMenu);
 
-//        menu navbar
+//  menu navbar
         overlay = findViewById(R.id.overlay);
         topSheet = findViewById(R.id.topSheet);
 
 
-        // Abrir/cerrar menú al tocar el botón del navbar
+//  Abrir/cerrar menú al tocar el botón del navbar
         btnMenu.setOnClickListener(v -> toggleMenu());
 
-        // Cerrar si tocás fuera del menú
+//  Cerrar si tocás fuera del menú
         overlay.setOnClickListener(v -> closeMenu());
 
 
-// Listener de opciones del menú
+//  Listener de opciones del menú
         findViewById(R.id.btnMisDatos).setOnClickListener(v -> {
             closeMenu();
-            // TODO: abrir pantalla de perfil cuando exista
-            // startActivity(new Intent(MainActivity.this, PerfilActivity.class));
+
+             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
         });
 
         findViewById(R.id.btnMiCarrito).setOnClickListener(v -> {

@@ -14,6 +14,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.lamontana.MainActivity;
 import com.example.lamontana.R;
 import com.example.lamontana.viewmodel.SignupViewModel;
+
+import com.example.lamontana.data.user.UserStore;
+
+// para firebase
+import com.google.firebase.auth.FirebaseAuth;
 /* -----------------------------------------------------------------------------
   Archivo: SignupActivity.java
   Responsabilidad:
@@ -242,10 +247,24 @@ public class SignupActivity extends AppCompatActivity {
      * Navega a la pantalla principal (MainActivity) tras un registro exitoso.
      */
     private void navigateAfterSignup(String name, String email) {
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.putExtra("name", name);
+//        intent.putExtra("email", email);
+//        startActivity(intent);
+//        finish(); // Cierra actividad de registro
+
+        // Obtener UID del usuario que acaba de registrarse - esto cuando firebase este funcional
+//        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        String uid = "local-temp-user";  // UID temporal para desarrollo
+
+        // Guardar datos básicos en UserStore
+        UserStore.get().setBasicData(uid, name, email);
+
+        // Navegar a MainActivity
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("name", name);
-        intent.putExtra("email", email);
         startActivity(intent);
-        finish(); // Cierra actividad de registro
+
+        finish(); // Cierra SignupActivity
     }
 }
