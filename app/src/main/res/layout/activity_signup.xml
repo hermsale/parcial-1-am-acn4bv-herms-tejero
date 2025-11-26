@@ -36,6 +36,14 @@
     android:background="@color/brand_background"
     android:padding="24dp">
 
+    <!--    navbar publico-->
+    <include
+        android:id="@+id/includeNavbar"
+        layout="@layout/include_navbar_public"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- Contenedor principal del formulario -->
     <LinearLayout
         android:id="@+id/signupContainer"
@@ -111,4 +119,12 @@
 
     </LinearLayout>
 
+    <include
+        android:id="@+id/includeFooter"
+        layout="@layout/include_footer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
