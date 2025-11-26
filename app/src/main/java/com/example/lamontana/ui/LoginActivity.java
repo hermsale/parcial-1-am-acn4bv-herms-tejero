@@ -1,36 +1,5 @@
 package com.example.lamontana.ui;
 
-/* -----------------------------------------------------------------------------
-  Archivo: LoginActivity.java
-  Responsabilidad:
-    - Mostrar el formulario de inicio de sesión.
-    - Validar datos básicos ingresados por el usuario (email y contraseña).
-    - Navegar a la pantalla principal de catálogo si el login es válido.
-
-  Alcance:
-    - Es la pantalla de entrada de la aplicación (launcher).
-    - Por ahora realiza un "login local" sin conexión real a servidor/Firebase.
-    - Más adelante se integrará con Firebase Auth para login real.
-
-  Lista de métodos públicos:
-    - onCreate(Bundle savedInstanceState)
-        * Ciclo de vida de la Activity. Inicializa la UI y configura listeners.
-
-  Lista de métodos privados:
-    - setupViews()
-        * Enlaza los elementos visuales del layout con las variables de la Activity.
-    - setupListeners()
-        * Configura las acciones de los botones y eventos de la pantalla.
-    - attemptLogin()
-        * Valida los campos de email y contraseña.
-        * Muestra mensajes de error si faltan datos.
-        * Navega a la pantalla principal si el login es aceptado.
-
-  Notas:
-    - Esta implementación es intencionalmente simple para el parcial.
-    - La lógica de autenticación real (Firebase Auth) se agregará en pasos posteriores.
------------------------------------------------------------------------------ */
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -39,10 +8,49 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.lamontana.MainActivity;
 import com.example.lamontana.R;
+import com.example.lamontana.viewmodel.LoginViewModel;
 
+/* -----------------------------------------------------------------------------
+  Archivo: LoginActivity.java
+  Responsabilidad:
+    - Mostrar el formulario de inicio de sesión.
+    - Validar datos básicos ingresados por el usuario (email y contraseña).
+    - Delegar el proceso de login real a LoginViewModel (Firebase Auth).
+    - Navegar a la pantalla principal de catálogo si el login es válido.
+
+  Alcance:
+    - Es la pantalla de entrada de la aplicación (launcher).
+    - Forma parte del flujo de autenticación usando Firebase Auth.
+    - Observa LiveData del LoginViewModel para:
+        * loading: habilitar/deshabilitar botones.
+        * loginSuccess: navegar al catálogo.
+        * errorMessage: mostrar mensajes de error.
+
+  Lista de métodos públicos:
+    - onCreate(Bundle savedInstanceState)
+        * Ciclo de vida de la Activity. Inicializa la UI, el ViewModel y los listeners.
+
+  Lista de métodos privados:
+    - setupViews()
+        * Enlaza los elementos visuales del layout con las variables de la Activity.
+    - setupListeners()
+        * Configura las acciones de los botones y eventos de la pantalla.
+    - setupViewModel()
+        * Obtiene una instancia de LoginViewModel.
+    - observeViewModel()
+        * Se suscribe a los LiveData de LoginViewModel (loading, loginSuccess, errorMessage).
+    - attemptLogin()
+        * Valida los campos de email y contraseña.
+        * Si son válidos, llama a loginViewModel.login(email, password).
+    - navigateToMain(String email)
+        * Navega a la pantalla principal (MainActivity) tras login exitoso.
+
+----------------------------------------------------------------------------- */
 public class LoginActivity extends AppCompatActivity {
 
     // -------------------------------------------------------------------------
@@ -51,9 +59,13 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etEmail;
     private EditText etPassword;
     private Button btnLogin;
-
-//    este atributo lleva a la vista para crear cuenta
+    // Botón para ir a la vista de crear cuenta
     private Button btnGoToSignup;
+
+    // -------------------------------------------------------------------------
+    // ViewModel
+    // -------------------------------------------------------------------------
+    private LoginViewModel loginViewModel;
 
     // -------------------------------------------------------------------------
     // Ciclo de vida
@@ -63,9 +75,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // IMPORTANTE: estos métodos deben ejecutarse después de setContentView
         setupViews();
         setupListeners();
+        setupViewModel();
+        observeViewModel();
     }
 
     // -------------------------------------------------------------------------
@@ -80,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);       // Debe existir @+id/etEmail en el XML
         etPassword = findViewById(R.id.etPassword); // Debe existir @+id/etPassword en el XML
         btnLogin = findViewById(R.id.btnLogin);     // Debe existir @+id/btnLogin en el XML
-        btnGoToSignup = findViewById(R.id.btnGoToSignup); // boton para ir a la pantalla de registro
+        btnGoToSignup = findViewById(R.id.btnGoToSignup); // botón para ir a la pantalla de registro
     }
 
     /**
@@ -91,7 +104,6 @@ public class LoginActivity extends AppCompatActivity {
             btnLogin.setOnClickListener(view -> attemptLogin());
         }
 
-
         // Listener para ir al Signup
         if (btnGoToSignup != null) {
             btnGoToSignup.setOnClickListener(view -> {
@@ -101,17 +113,76 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Inicializa el ViewModel de Login utilizando ViewModelProvider.
+     */
+    private void setupViewModel() {
+        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+    }
+
+    /**
+     * Se suscribe a los LiveData del LoginViewModel para reaccionar a cambios
+     * de estado de la autenticación.
+     */
+    private void observeViewModel() {
+        if (loginViewModel == null) return;
+
+        // Observa el estado de carga
+        loginViewModel.getLoading().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean isLoading) {
+                if (isLoading == null) return;
+
+                // Deshabilitar / habilitar botón de login según el estado
+                if (btnLogin != null) {
+                    btnLogin.setEnabled(!isLoading);
+                    btnLogin.setText(isLoading ? "Ingresando..." : "Ingresar");
+                }
+
+                if (btnGoToSignup != null) {
+                    btnGoToSignup.setEnabled(!isLoading);
+                }
+            }
+        });
+
+        // Observa si el login fue exitoso
+        loginViewModel.getLoginSuccess().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean success) {
+                if (success != null && success) {
+                    // Obtenemos el email actual del campo para mostrarlo o enviarlo
+                    String email = etEmail != null
+                            ? etEmail.getText().toString().trim()
+                            : "";
+
+                    Toast.makeText(LoginActivity.this,
+                            "Login exitoso", Toast.LENGTH_SHORT).show();
+
+                    navigateToMain(email);
+                }
+            }
+        });
+
+        // Observa mensajes de error
+        loginViewModel.getErrorMessage().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String message) {
+                if (message != null && !message.isEmpty()) {
+                    Toast.makeText(LoginActivity.this,
+                            message, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
     // -------------------------------------------------------------------------
-    // Lógica de negocio (simplificada)
+    // Lógica de negocio (validación local + llamada al ViewModel)
     // -------------------------------------------------------------------------
 
     /**
-     * Valida los campos del formulario de login y navega a la pantalla principal
-     * si la validación es exitosa.
-     *
-     * Notas:
-     * - Por ahora solo verificamos que los campos no estén vacíos.
-     * - Más adelante se reemplazará por autenticación real con Firebase Auth.
+     * Valida los campos del formulario de login y, si son válidos,
+     * llama al LoginViewModel para iniciar el proceso de autenticación
+     * contra Firebase Auth.
      */
     private void attemptLogin() {
         String email = etEmail != null ? etEmail.getText().toString().trim() : "";
@@ -134,19 +205,29 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // Login local "de mentira" para el parcial:
-        // Si llegamos hasta acá, consideramos el login como exitoso.
-        // ---------------------------------------------------------------------
+        if (loginViewModel == null) {
+            Toast.makeText(this,
+                    "Error interno: ViewModel no inicializado",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        Toast.makeText(this, "Login exitoso", Toast.LENGTH_SHORT).show();
+        // Llamada al ViewModel: el resultado se manejará en los observers
+        loginViewModel.login(email, password);
+    }
 
-        // Navegar a la pantalla principal (catálogo/carrito actual)
+    /**
+     * Navega a la pantalla principal (catálogo) una vez que el login
+     * fue exitoso.
+     *
+     * @param email Email del usuario logueado (opcional, se pasa como extra).
+     */
+    private void navigateToMain(String email) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("email", email); // Enviamos el email por si luego se usa
+        intent.putExtra("email", email);
         startActivity(intent);
 
-        // Opcional: cerrar la pantalla de login para que no se vuelva atrás
+        // Cerrar la pantalla de login para que no se pueda volver atrás fácilmente
         finish();
     }
 }
