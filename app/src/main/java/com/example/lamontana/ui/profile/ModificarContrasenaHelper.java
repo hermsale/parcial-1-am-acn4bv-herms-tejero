@@ -28,10 +28,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
  *   - Muestra un diálogo donde el usuario ingresa:
  *       · Contraseña actual.
  *       · Nueva contraseña.
+ *       · Confirmación de la nueva contraseña.
  *   - Valida que:
- *       · Ambas contraseñas no estén vacías.
+ *       · Ninguno de los campos esté vacío.
  *       · La nueva contraseña cumpla una longitud mínima
  *         (por ejemplo, >= 6 caracteres).
+ *       · La nueva contraseña y su confirmación sean iguales.
  *   - Reautentica al usuario en Firebase Auth usando la
  *     contraseña actual.
  *   - Si la reautenticación es correcta:
@@ -50,7 +52,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
  *
  * Métodos presentes:
  *   - mostrarDialogoCambioContrasena(Activity activity):
- *       · Construye y muestra el AlertDialog con los 2 campos
+ *       · Construye y muestra el AlertDialog con los 3 campos
  *         de contraseña.
  *       · Ejecuta toda la lógica de:
  *           - Validación de campos.
@@ -67,10 +69,14 @@ public class ModificarContrasenaHelper {
      * Muestra el diálogo para cambiar la contraseña del usuario actual.
      *
      * Flujo:
-     *  1) Muestra 2 EditText:
+     *  1) Muestra 3 EditText:
      *       - Contraseña actual.
      *       - Nueva contraseña.
-     *  2) Valida longitud mínima de la nueva contraseña.
+     *       - Confirmar nueva contraseña.
+     *  2) Valida:
+     *       - Que ninguno esté vacío.
+     *       - Que la nueva contraseña tenga longitud mínima.
+     *       - Que la nueva y la confirmación sean iguales.
      *  3) Reautentica al usuario usando EmailAuthProvider.
      *  4) Actualiza la contraseña en Firebase Auth.
      *  5) Actualiza el campo "passwordHash" y "actualizadoEn"
@@ -115,12 +121,27 @@ public class ModificarContrasenaHelper {
                 )
         );
 
+        // Campo para confirmar nueva contraseña
+        final EditText etConfirmNewPassword = new EditText(activity);
+        etConfirmNewPassword.setHint("Repetir nueva contraseña");
+        etConfirmNewPassword.setInputType(
+                InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD
+        );
+        layout.addView(
+                etConfirmNewPassword,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+        );
+
         new AlertDialog.Builder(activity)
                 .setTitle("Cambiar contraseña")
                 .setView(layout)
                 .setPositiveButton("Cambiar", (dialog, which) -> {
                     String currentPassword = etCurrentPassword.getText().toString().trim();
                     String newPassword = etNewPassword.getText().toString().trim();
+                    String confirmNewPassword = etConfirmNewPassword.getText().toString().trim();
 
                     // Validaciones básicas
                     if (currentPassword.isEmpty()) {
@@ -141,11 +162,30 @@ public class ModificarContrasenaHelper {
                         return;
                     }
 
+                    if (confirmNewPassword.isEmpty()) {
+                        Toast.makeText(
+                                activity,
+                                "Repita la nueva contraseña",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        return;
+                    }
+
                     // Validar solo cantidad de caracteres (por ejemplo mínimo 6)
                     if (newPassword.length() < 6) {
                         Toast.makeText(
                                 activity,
                                 "La nueva contraseña debe tener al menos 6 caracteres",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        return;
+                    }
+
+                    // Validar que las dos nuevas contraseñas coincidan
+                    if (!newPassword.equals(confirmNewPassword)) {
+                        Toast.makeText(
+                                activity,
+                                "Las contraseñas nuevas no coinciden",
                                 Toast.LENGTH_LONG
                         ).show();
                         return;
