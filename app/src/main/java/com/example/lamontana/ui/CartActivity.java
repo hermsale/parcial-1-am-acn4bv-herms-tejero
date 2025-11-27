@@ -102,7 +102,7 @@ public class CartActivity extends AppCompatActivity {
         View btnMiCarrito = findViewById(R.id.btnMiCarrito);
         View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
-// Usar el helper centralizado
+// Usar el helper centralizado - del NAVBAR
         MenuDesplegableHelper menuHelper =
                 new MenuDesplegableHelper(
                         this,
@@ -116,57 +116,6 @@ public class CartActivity extends AppCompatActivity {
                 );
 
         menuHelper.initMenu();
-
-        // ---------- Navbar / Menú deslizante ----------
-//        ImageView btnMenu = findViewById(R.id.btnMenu);
-//        overlay = findViewById(R.id.overlay);
-//        topSheet = findViewById(R.id.topSheet);
-//
-//        if (btnMenu != null) {
-//            btnMenu.setOnClickListener(v -> toggleMenu());
-//        }
-//        if (overlay != null) {
-//            overlay.setOnClickListener(v -> closeMenu());
-//        }
-
-        // Botones dentro del top sheet
-//        View btnInicio = findViewById(R.id.btnInicio);
-//        View btnMisDatos = findViewById(R.id.btnMisDatos);
-//        View btnMiCarrito = findViewById(R.id.btnMiCarrito);
-//        View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
-//
-//        if (btnInicio != null) {
-//            btnInicio.setOnClickListener(v -> {
-//                closeMenu();
-//                startActivity(new Intent(CartActivity.this, CatalogActivity.class));
-//            });
-//        }
-//
-//        if (btnMisDatos != null) {
-//            btnMisDatos.setOnClickListener(v -> {
-//                closeMenu();
-//                startActivity(new Intent(CartActivity.this, ProfileActivity.class));
-//            });
-//        }
-//
-//        if (btnMiCarrito != null) {
-//            btnMiCarrito.setOnClickListener(v -> {
-//                closeMenu();
-//                // Ya estás en Carrito; si querés simplemente refrescar:
-//                renderCart();
-//            });
-//        }
-//
-//        if (btnCerrarSesion != null) {
-//            btnCerrarSesion.setOnClickListener(v -> {
-//                closeMenu();
-//                FirebaseAuth.getInstance().signOut();
-//                Intent intent = new Intent(CartActivity.this, LoginActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(intent);
-//                finish();
-//            });
-//        }
 
         // ---- Referencias de UI del carrito ----
         llCartListContainer = findViewById(R.id.llCartListContainer);
@@ -328,35 +277,6 @@ public class CartActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Acción “Realizar todos los pedidos”.
-     */
-//    private void onPlaceAllOrders() {
-//        int items = CartStore.get().getTotalQty();
-//        int total = CartStore.get().getTotalAmount();
-//        if (items <= 0) return;
-//
-//        new AlertDialog.Builder(this)
-//                .setTitle(getString(R.string.confirm_all_orders_title))
-//                .setMessage(
-//                        getString(
-//                                R.string.confirm_all_orders_msg,
-//                                items,
-//                                ars.format(total)
-//                        )
-//                )
-//                .setPositiveButton(getString(R.string.ok), (d, w) -> {
-//                    new AlertDialog.Builder(this)
-//                            .setMessage(getString(R.string.all_orders_done))
-//                            .setPositiveButton(getString(R.string.ok), (d2, w2) -> {
-//                                CartStore.get().clear();
-//                                renderCart();
-//                            })
-//                            .show();
-//                })
-//                .setNegativeButton(getString(R.string.cancel), null)
-//                .show();
-//    }
 
     /**
      * Busca un CartItem actual por el nombre del producto.

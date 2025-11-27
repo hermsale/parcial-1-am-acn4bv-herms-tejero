@@ -82,5 +82,8 @@
 
 <!--        checkout despues de pulsar Realizar Pedido -->
         <activity android:name=".ui.CheckoutActivity" />
+
+        <activity android:name=".ui.SuccessActivity" />
+
     </application>
 </manifest>

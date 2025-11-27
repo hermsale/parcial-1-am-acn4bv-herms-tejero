@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 
@@ -16,6 +17,7 @@ import com.example.lamontana.R;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.ui.navbar.MenuDesplegableHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -44,6 +46,11 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
 
+
+    // Formateador de moneda en ARS
+    private final NumberFormat ars =
+            NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,47 +59,30 @@ public class CheckoutActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_cart_detail);
 
+        // ---------- Navbar / Menú deslizante ----------
         ImageView btnMenu = findViewById(R.id.btnMenu);
-        overlay = findViewById(R.id.overlay);
-        topSheet = findViewById(R.id.topSheet);
+        View overlay = findViewById(R.id.overlay);
+        View topSheet = findViewById(R.id.topSheet);
 
-        if (btnMenu != null) {
-            btnMenu.setOnClickListener(v -> toggleMenu());
-        }
-        if (overlay != null) {
-            overlay.setOnClickListener(v -> closeMenu());
-        }
-
-        // Botones dentro del top sheet
+        View btnInicio = findViewById(R.id.btnInicio);
         View btnMisDatos = findViewById(R.id.btnMisDatos);
         View btnMiCarrito = findViewById(R.id.btnMiCarrito);
         View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
-        if (btnMisDatos != null) {
-            btnMisDatos.setOnClickListener(v -> {
-                closeMenu();
-                startActivity(new Intent(CheckoutActivity.this, ProfileActivity.class));
-            });
-        }
+// Usar el helper centralizado - del NAVBAR
+        MenuDesplegableHelper menuHelper =
+                new MenuDesplegableHelper(
+                        this,
+                        btnMenu,
+                        overlay,
+                        topSheet,
+                        btnInicio,
+                        btnMisDatos,
+                        btnMiCarrito,
+                        btnCerrarSesion
+                );
 
-        if (btnMiCarrito != null) {
-            btnMiCarrito.setOnClickListener(v -> {
-                closeMenu();
-                // Ya estás en Carrito; si querés simplemente refrescar:
-//                renderCart();
-            });
-        }
-
-        if (btnCerrarSesion != null) {
-            btnCerrarSesion.setOnClickListener(v -> {
-                closeMenu();
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(CheckoutActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            });
-        }
+        menuHelper.initMenu();
 
         initViews();
         renderProducts();
@@ -123,9 +113,8 @@ public class CheckoutActivity extends AppCompatActivity {
             // TODO: calcular envío
         });
 
-        btnGoToPayment.setOnClickListener(v -> {
-            // TODO: navegar a pantalla de pago
-        });
+//        boton de pago
+        btnGoToPayment.setOnClickListener(v -> onPlaceAllOrders());
     }
 
     // ----------------------------------------------------------
@@ -173,43 +162,31 @@ public class CheckoutActivity extends AppCompatActivity {
         tvFinalTotal.setText("Total: " + currencyFormat.format(total));
     }
 
+    /**
+     * Acción “Realizar todos los pedidos”.
+     */
+    private void onPlaceAllOrders() {
+        int items = CartStore.get().getTotalQty();
+        int total = CartStore.get().getTotalAmount();
+        if (items <= 0) return;
 
 
-    // ----- Control del menú deslizante (top sheet / navbar) -----
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar compra")
+                .setMessage("Vas a realizar " + items + " pedidos por un total de " + ars.format(total))
+                .setPositiveButton("Confirmar", (dialog, which) -> {
 
-    private void toggleMenu() {
-        if (isMenuOpen) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
+                    // Vaciar carrito
+                    CartStore.get().clear();
+
+                    // Ir a pantalla de éxito
+                    Intent i = new Intent(CheckoutActivity.this, SuccessActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
-    private void openMenu() {
-        if (topSheet == null || overlay == null) return;
-
-        topSheet.setVisibility(View.VISIBLE);
-        topSheet.startAnimation(
-                android.view.animation.AnimationUtils.loadAnimation(
-                        this,
-                        R.anim.top_sheet_down
-                )
-        );
-        overlay.setVisibility(View.VISIBLE);
-        isMenuOpen = true;
-    }
-
-    private void closeMenu() {
-        if (topSheet == null || overlay == null) return;
-
-        topSheet.startAnimation(
-                android.view.animation.AnimationUtils.loadAnimation(
-                        this,
-                        R.anim.top_sheet_up
-                )
-        );
-        overlay.setVisibility(View.GONE);
-        topSheet.setVisibility(View.GONE);
-        isMenuOpen = false;
-    }
 }
