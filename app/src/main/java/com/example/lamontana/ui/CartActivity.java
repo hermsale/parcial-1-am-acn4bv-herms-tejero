@@ -3,7 +3,7 @@ package com.example.lamontana.ui;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;                    // <-- agregado
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;

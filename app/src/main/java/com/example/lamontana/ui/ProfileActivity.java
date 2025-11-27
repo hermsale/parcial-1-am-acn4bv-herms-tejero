@@ -8,13 +8,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.lamontana.R;
 import com.example.lamontana.data.user.UserStore;
 import com.example.lamontana.ui.navbar.MenuDesplegableHelper;
 import com.example.lamontana.ui.profile.ModificarContrasenaHelper;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.lamontana.viewmodel.ProfileViewModel;
 
 /*
  * ============================================================
@@ -25,14 +25,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
  *   - Muestra y permite editar los datos básicos del usuario:
  *       · nombre
  *       · apellido
- *       · email
+ *       · email (solo lectura)
  *       · teléfono
  *       · dirección
- *   - Carga y guarda esos datos en UserStore (estado en memoria).
- *   - Sincroniza los cambios con Firestore en la colección
- *     "usuarios" (documento usuarios/{uid}).
+ *   - Carga esos datos desde UserStore (estado en memoria) a
+ *     los campos del formulario.
+ *   - Delegar el guardado de cambios al ProfileViewModel, que:
+ *       · Actualiza UserStore.
+ *       · Sincroniza con Firestore (colección "usuarios").
+ *       · Expone estados loading / saveSuccess / errorMessage.
  *   - Ofrece la acción "Cambiar contraseña", delegando toda la
- *     lógica de Auth + Firestore en el helper:
+ *     lógica de Auth + Firestore en:
  *       · ModificarContrasenaHelper.mostrarDialogoCambioContrasena(...)
  *   - Muestra el navbar con menú desplegable (top sheet) para:
  *       · Ir al inicio (Catálogo)
@@ -44,12 +47,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * Clases usadas:
  *   - UserStore:
  *       * Almacena datos básicos del usuario en memoria.
- *   - FirebaseFirestore:
- *       * Actualiza los datos del usuario en la colección
- *         "usuarios" (nombre, apellido, teléfono, dirección).
- *   - FieldValue:
- *       * Permite setear el campo "actualizadoEn" con
- *         serverTimestamp().
+ *   - ProfileViewModel:
+ *       * Orquesta el guardado de perfil (UserStore + Firestore).
  *   - MenuDesplegableHelper:
  *       * Maneja el menú top-sheet del navbar (animaciones y
  *         navegación).
@@ -59,15 +58,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * Métodos presentes:
  *   - onCreate(Bundle):
  *       * Configura la UI, inicializa vistas, menú (helper),
- *         listeners y carga datos del usuario.
+ *         ViewModel, listeners y carga datos del usuario.
  *   - initViews():
  *       * Enlaza las vistas de los campos de perfil.
+ *   - setupMenu():
+ *       * Configura MenuDesplegableHelper.
  *   - setupListeners():
  *       * Configura botones de "Guardar" y "Cambiar contraseña".
+ *   - observeViewModel():
+ *       * Observa loading / saveSuccess / errorMessage del
+ *         ProfileViewModel y actualiza la UI.
  *   - saveProfile():
- *       * Lee campos del formulario.
- *       * Actualiza UserStore en memoria.
- *       * Sincroniza Firestore (perfil).
+ *       * Lee campos del formulario y delega el guardado en
+ *         profileViewModel.saveProfile(...).
  *   - loadUserData() / bindUserData():
  *       * Carga los datos desde UserStore en los EditText.
  * ============================================================
@@ -75,10 +78,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private EditText etNombre, etApellido, etEmail, etTelefono, etDireccion;
+    // --- Vistas de formulario ---
+    private EditText etNombre;
+    private EditText etApellido;
+    private EditText etEmail;
+    private EditText etTelefono;
+    private EditText etDireccion;
+    private View btnSave;
+    private View btnChangePassword;
 
     // Helper para el menú desplegable del navbar
     private MenuDesplegableHelper menuHelper;
+
+    // ViewModel para gestionar perfil de usuario
+    private ProfileViewModel profileViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,9 +99,35 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         initViews();
+        setupMenu();
 
-        // ---------- Configurar menú desplegable con helper ----------
-        ImageView btnMenu = findViewById(R.id.btnMenu);       // viene del include_navbar.xml
+        // ---------- Inicializar ViewModel ----------
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        observeViewModel();
+
+        setupListeners();
+        loadUserData();
+    }
+
+    /**
+     * Enlaza las vistas de la pantalla con las variables de la Activity.
+     */
+    private void initViews() {
+        etNombre = findViewById(R.id.etNombre);
+        etApellido = findViewById(R.id.etApellido);
+        etEmail = findViewById(R.id.etEmail);
+        etTelefono = findViewById(R.id.etTelefono);
+        etDireccion = findViewById(R.id.etDireccion);
+
+        btnSave = findViewById(R.id.btnSave);
+        btnChangePassword = findViewById(R.id.btnChangePassword);
+    }
+
+    /**
+     * Configura el menú desplegable (navbar) usando el helper común.
+     */
+    private void setupMenu() {
+        ImageView btnMenu = findViewById(R.id.btnMenu); // viene de include_navbar.xml
         View overlay = findViewById(R.id.overlay);
         View topSheet = findViewById(R.id.topSheet);
 
@@ -108,20 +147,6 @@ public class ProfileActivity extends AppCompatActivity {
                 btnCerrarSesion
         );
         menuHelper.initMenu();
-
-        setupListeners();
-        loadUserData();
-    }
-
-    /**
-     * Enlaza las vistas de la pantalla con las variables de la Activity.
-     */
-    private void initViews() {
-        etNombre = findViewById(R.id.etNombre);
-        etApellido = findViewById(R.id.etApellido);
-        etEmail = findViewById(R.id.etEmail);
-        etTelefono = findViewById(R.id.etTelefono);
-        etDireccion = findViewById(R.id.etDireccion);
     }
 
     /**
@@ -141,12 +166,10 @@ public class ProfileActivity extends AppCompatActivity {
      * Configura listeners para los botones de "Guardar" y "Cambiar contraseña".
      */
     private void setupListeners() {
-        View btnSave = findViewById(R.id.btnSave);
         if (btnSave != null) {
             btnSave.setOnClickListener(v -> saveProfile());
         }
 
-        View btnChangePassword = findViewById(R.id.btnChangePassword);
         if (btnChangePassword != null) {
             btnChangePassword.setOnClickListener(
                     v -> ModificarContrasenaHelper.mostrarDialogoCambioContrasena(ProfileActivity.this)
@@ -155,60 +178,71 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Guarda los datos editados:
-     *  1) Actualiza UserStore en memoria.
-     *  2) Si tenemos un UID válido, actualiza también Firestore
-     *     en la colección "usuarios" (documento usuarios/{uid}).
+     * Observa los estados del ProfileViewModel para actualizar la UI.
+     */
+    private void observeViewModel() {
+        if (profileViewModel == null) return;
+
+        // Loading: habilitar / deshabilitar botón "Guardar cambios"
+        profileViewModel.getLoading().observe(this, isLoading -> {
+            if (btnSave != null && isLoading != null) {
+                btnSave.setEnabled(!isLoading);
+            }
+        });
+
+        // saveSuccess: mostrar mensaje de éxito
+        profileViewModel.getSaveSuccess().observe(this, success -> {
+            if (success != null && success) {
+                Toast.makeText(
+                        ProfileActivity.this,
+                        "Datos guardados correctamente",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+
+        // errorMessage: mostrar mensaje de error
+        profileViewModel.getErrorMessage().observe(this, msg -> {
+            if (msg != null && !msg.trim().isEmpty()) {
+                Toast.makeText(
+                        ProfileActivity.this,
+                        msg,
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        });
+    }
+
+    /**
+     * Lee los campos del formulario y delega el guardado en el ViewModel.
      */
     private void saveProfile() {
-        // 1) Leer campos desde la UI (con null-checks defensivos)
+        // 1) Leer campos desde la UI
         String nombre = etNombre != null ? etNombre.getText().toString().trim() : "";
         String apellido = etApellido != null ? etApellido.getText().toString().trim() : "";
         String telefono = etTelefono != null ? etTelefono.getText().toString().trim() : "";
         String direccion = etDireccion != null ? etDireccion.getText().toString().trim() : "";
 
-        // 2) Actualizar UserStore en memoria
-        UserStore store = UserStore.get();
-        // nombre forma parte de los datos "básicos"
-        String nombreFinal = nombre.isEmpty() ? store.nombre : nombre;
-        store.setBasicData(store.uid, nombreFinal, store.email);
-        // los opcionales se actualizan siempre
-        store.setOptionalData(apellido, telefono, direccion);
+        // Validación mínima: nombre no vacío (podés sumar más si querés)
+        if (nombre.isEmpty()) {
+            if (etNombre != null) {
+                etNombre.setError("Ingrese su nombre");
+                etNombre.requestFocus();
+            }
+            return;
+        }
 
-        // 3) Obtener UID para Firestore
-        String uid = store.uid;
-
-        if (uid == null || uid.trim().isEmpty()) {
-            // No tenemos UID válido: no podemos sincronizar con Firestore
+        if (profileViewModel == null) {
             Toast.makeText(
                     this,
-                    "Datos guardados localmente, pero no se pudo sincronizar con Firestore (UID vacío).",
-                    Toast.LENGTH_LONG
+                    "Error interno: ProfileViewModel no inicializado",
+                    Toast.LENGTH_SHORT
             ).show();
             return;
         }
 
-        // 4) Actualizar Firestore a través de la colección "usuarios"
-        FirebaseFirestore.getInstance()
-                .collection("usuarios")
-                .document(uid)
-                .update(
-                        "nombre", nombreFinal,
-                        "apellido", apellido,
-                        "telefono", telefono,
-                        "direccion", direccion,
-                        "actualizadoEn", FieldValue.serverTimestamp()
-                )
-                .addOnSuccessListener(unused -> Toast.makeText(
-                        ProfileActivity.this,
-                        "Datos guardados correctamente",
-                        Toast.LENGTH_SHORT
-                ).show())
-                .addOnFailureListener(e -> Toast.makeText(
-                        ProfileActivity.this,
-                        "Error al guardar datos en Firestore: " + e.getMessage(),
-                        Toast.LENGTH_LONG
-                ).show());
+        // 2) Delegar la lógica de guardado al ViewModel
+        profileViewModel.saveProfile(nombre, apellido, telefono, direccion);
     }
 
     /**
