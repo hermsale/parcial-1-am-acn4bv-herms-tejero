@@ -12,13 +12,14 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.lamontana.R;
-import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
 import com.example.lamontana.ui.navbar.MenuDesplegableHelper;
+import com.example.lamontana.viewmodel.CartViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,30 +48,18 @@ import java.util.Locale;
  *   - Carga las imágenes de los productos desde la URL remota
  *     (Product.imageUrl, proveniente de Firestore/Storage) usando Glide,
  *     con fallback al recurso drawable local (imageRes).
+ *   - Delegar la lógica de estado del carrito en CartViewModel, que
+ *     a su vez envuelve CartStore y expone LiveData:
+ *       · Lista de CartItem
+ *       · Total en pesos
+ *       · Cantidad total de ítems
  *
  * Clases usadas:
- *   - CartStore (data): estado del carrito en memoria.
+ *   - CartViewModel: capa de lógica de negocio del carrito.
  *   - CartItem/Product (model): datos de dominio.
  *   - FirebaseAuth/FirebaseUser: autenticación de usuario.
  *   - Glide: carga de imágenes desde URL.
  *   - MenuDesplegableHelper: lógica común del menú top-sheet.
- *
- * Métodos presentes:
- *   - onCreate():
- *       * Verifica usuario logueado (ensureUserLoggedIn()).
- *       * Configura UI, menú del navbar (via helper) y dibuja el carrito.
- *   - ensureUserLoggedIn():
- *       * Si no hay usuario -> LoginActivity y finish().
- *   - renderCart():
- *       * Infla filas (item_cart_detail) por cada CartItem y renderiza datos.
- *   - rebindRowAfterChange(View, Product):
- *       * Refresca cantidad/total de una fila tras un cambio (+/-).
- *   - updateGrandTotal():
- *       * Recalcula total global y habilita/deshabilita “Realizar todos”.
- *   - onPlaceAllOrders():
- *       * Confirma y limpia carrito (simulado).
- *   - findCartItemByProductName(String):
- *       * Busca el CartItem asociado a un Product por nombre.
  * ============================================================
  */
 public class CartActivity extends AppCompatActivity {
@@ -83,6 +72,9 @@ public class CartActivity extends AppCompatActivity {
 
     // Helper para el menú deslizante del navbar
     private MenuDesplegableHelper menuHelper;
+
+    // ViewModel del carrito
+    private CartViewModel cartViewModel;
 
     // Formateador de moneda en ARS
     private final NumberFormat ars =
@@ -141,8 +133,28 @@ public class CartActivity extends AppCompatActivity {
             btnPlaceAll.setOnClickListener(v -> onPlaceAllOrders());
         }
 
-        // Primer render de la lista
-        renderCart();
+        // ---------- Inicializar ViewModel y observar LiveData ----------
+        cartViewModel = new ViewModelProvider(this).get(CartViewModel.class);
+
+        // Lista de ítems: cada cambio re-renderiza el carrito completo
+        cartViewModel.getItems().observe(this, this::renderCart);
+
+        // Totales: cada cambio actualiza el total y el estado del botón
+        cartViewModel.getTotalAmount().observe(this, totalAmount -> {
+            Integer qty = cartViewModel.getTotalQty().getValue();
+            updateGrandTotal(
+                    totalAmount != null ? totalAmount : 0,
+                    qty != null ? qty : 0
+            );
+        });
+
+        cartViewModel.getTotalQty().observe(this, qty -> {
+            Integer totalAmount = cartViewModel.getTotalAmount().getValue();
+            updateGrandTotal(
+                    totalAmount != null ? totalAmount : 0,
+                    qty != null ? qty : 0
+            );
+        });
     }
 
     /**
@@ -161,15 +173,18 @@ public class CartActivity extends AppCompatActivity {
     }
 
     /**
-     * Dibuja toda la lista del carrito.
+     * Dibuja toda la lista del carrito a partir de la lista observada.
      * Carga las imágenes desde URL usando Glide.
      */
-    private void renderCart() {
+    private void renderCart(List<CartItem> items) {
         if (llCartListContainer == null) return;
 
         llCartListContainer.removeAllViews();
+        if (items == null || items.isEmpty()) {
+            // Podrías opcionalmente mostrar un mensaje de "Carrito vacío" aquí.
+            return;
+        }
 
-        List<CartItem> items = CartStore.get().getItems();
         LayoutInflater inflater = LayoutInflater.from(this);
 
         for (CartItem ci : items) {
@@ -225,20 +240,14 @@ public class CartActivity extends AppCompatActivity {
                 );
             }
 
+            // ----- Listeners para +, -, eliminar delegando en el ViewModel -----
+
             if (btnMinus != null) {
-                btnMinus.setOnClickListener(v -> {
-                    CartStore.get().dec(p);
-                    rebindRowAfterChange(row, p);
-                    updateGrandTotal();
-                });
+                btnMinus.setOnClickListener(v -> cartViewModel.dec(p));
             }
 
             if (btnPlus != null) {
-                btnPlus.setOnClickListener(v -> {
-                    CartStore.get().inc(p);
-                    rebindRowAfterChange(row, p);
-                    updateGrandTotal();
-                });
+                btnPlus.setOnClickListener(v -> cartViewModel.inc(p));
             }
 
             if (btnRemoveItem != null) {
@@ -247,8 +256,7 @@ public class CartActivity extends AppCompatActivity {
                             .setTitle("Eliminar producto")
                             .setMessage("¿Deseás quitar \"" + p.name + "\" del carrito?")
                             .setPositiveButton("Eliminar", (dialog, which) -> {
-                                CartStore.get().remove(p);
-                                renderCart();
+                                cartViewModel.remove(p);
                             })
                             .setNegativeButton("Cancelar", null)
                             .show();
@@ -257,47 +265,22 @@ public class CartActivity extends AppCompatActivity {
 
             llCartListContainer.addView(row);
         }
-
-        updateGrandTotal();
     }
 
     /**
-     * Refresca la cantidad y el total de una fila específica después de un cambio.
+     * Recalcula y muestra el total global (usando los valores que vienen
+     * del ViewModel).
      */
-    private void rebindRowAfterChange(View row, Product p) {
-        if (row == null || p == null) return;
-
-        CartItem current = findCartItemByProductName(p.name);
-        if (current == null) {
-            renderCart();
-            return;
-        }
-
-        TextView tvQty = row.findViewById(R.id.tvQty);
-        TextView tvItemTotal = row.findViewById(R.id.tvItemTotal);
-
-        if (tvQty != null) tvQty.setText(String.valueOf(current.qty));
-        if (tvItemTotal != null) {
-            tvItemTotal.setText(
-                    getString(R.string.item_total_format, ars.format(current.qty * p.price))
-            );
-        }
-    }
-
-    /**
-     * Recalcula y muestra el total global.
-     */
-    private void updateGrandTotal() {
-        int total = CartStore.get().getTotalAmount();
+    private void updateGrandTotal(int totalAmount, int totalQty) {
         if (tvCartGrandTotal != null) {
             tvCartGrandTotal.setText(
-                    getString(R.string.cart_total_label_format, ars.format(total))
+                    getString(R.string.cart_total_label_format, ars.format(totalAmount))
             );
         }
 
         MaterialButton btnPlaceAll = findViewById(R.id.btnPlaceAllOrders);
         if (btnPlaceAll != null) {
-            boolean enabled = CartStore.get().getTotalQty() > 0;
+            boolean enabled = totalQty > 0;
             btnPlaceAll.setEnabled(enabled);
             btnPlaceAll.setAlpha(enabled ? 1f : 0.5f);
         }
@@ -307,42 +290,33 @@ public class CartActivity extends AppCompatActivity {
      * Acción “Realizar todos los pedidos”.
      */
     private void onPlaceAllOrders() {
-        int items = CartStore.get().getTotalQty();
-        int total = CartStore.get().getTotalAmount();
-        if (items <= 0) return;
+        Integer items = cartViewModel.getTotalQty().getValue();
+        Integer total = cartViewModel.getTotalAmount().getValue();
+
+        int safeItems = items != null ? items : 0;
+        int safeTotal = total != null ? total : 0;
+
+        if (safeItems <= 0) return;
 
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.confirm_all_orders_title))
                 .setMessage(
                         getString(
                                 R.string.confirm_all_orders_msg,
-                                items,
-                                ars.format(total)
+                                safeItems,
+                                ars.format(safeTotal)
                         )
                 )
                 .setPositiveButton(getString(R.string.ok), (d, w) -> {
                     new AlertDialog.Builder(this)
                             .setMessage(getString(R.string.all_orders_done))
                             .setPositiveButton(getString(R.string.ok), (d2, w2) -> {
-                                CartStore.get().clear();
-                                renderCart();
+                                // Vaciar carrito a través del ViewModel
+                                cartViewModel.clear();
                             })
                             .show();
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show();
-    }
-
-    /**
-     * Busca un CartItem actual por el nombre del producto.
-     */
-    private CartItem findCartItemByProductName(String name) {
-        if (name == null) return null;
-        for (CartItem x : CartStore.get().getItems()) {
-            if (x.product != null && name.equals(x.product.name)) {
-                return x;
-            }
-        }
-        return null;
     }
 }
