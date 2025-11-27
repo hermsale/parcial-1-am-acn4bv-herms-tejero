@@ -310,7 +310,7 @@ public class CatalogActivity extends AppCompatActivity {
         }
     }
 
-    // Esto soluciona que, al volver desde el carrito, se actualice el resumen
+
     @Override
     protected void onResume() {
         super.onResume();

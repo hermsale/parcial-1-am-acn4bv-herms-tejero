@@ -28,8 +28,7 @@ package com.example.lamontana.model;
  *   - Simplifica las comparaciones y mejora la mantenibilidad del código.
  *
  * Notas:
- *   - Si en el futuro se agregan más tipos de servicios (por ejemplo “Copiado”),
- *     basta con sumar un nuevo valor al enum.
+ *   - esto es para futura aplicacion de filtros en productos y servicios
  * ============================================================
  */
 

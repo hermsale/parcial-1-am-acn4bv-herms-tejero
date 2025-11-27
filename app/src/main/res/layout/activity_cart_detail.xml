@@ -1,4 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  =============================================================
+  Archivo: activity_cart_detail.xml
+  Ubicación: res/layout/
+
+  ¿De qué se encarga este layout?
+    - Define la interfaz de la pantalla de Checkout / Detalle
+      del carrito en la app "La Montaña".
+    - Contiene:
+        · Navbar reutilizable (include_navbar).
+        · Botón "Volver al carrito" debajo del navbar.
+        · Un NestedScrollView con:
+            - Formulario de datos de envío (via include_shipping_form).
+            - Listado de productos del carrito (llDetailProducts).
+        · Barra inferior con:
+            - Total a pagar.
+            - Botón para "Realizar el Pago".
+        · Overlay y topSheet para el menú deslizante reutilizable.
+
+  Relación con clases Java:
+    - CheckoutActivity:
+        · Hace setContentView(R.layout.activity_cart_detail).
+        · Usa:
+            - btnBackToCart    → para volver al CartActivity (finish()).
+            - llDetailProducts → para inflar item_product_checkout.xml.
+            - tvFinalTotal     → para mostrar el total del carrito.
+            - btnGoToPayment   → para confirmar compra.
+        · También accede a los campos del formulario de envío
+          definidos dentro de include_shipping_form.xml:
+            - etAddress
+            - cbUseSavedAddress
+            - etPostalCode
+            - etPhone
+            - etNotes
+            - btnCalculateShipping
+
+    - MenuDesplegableHelper:
+        · Usa:
+            - overlay
+            - topSheet
+          junto con include_navbar para manejar el top-sheet del menú.
+
+  Vistas importantes:
+    - include_navbar     → barra superior reutilizable.
+    - btnBackToCart      → botón para volver al carrito (parte superior).
+    - scrollCheckout     → scroll general del checkout.
+    - includeShipping    → incluye el layout del formulario de envío.
+    - llDetailProducts   → contenedor de ítems del carrito.
+    - bottomBar          → contenedor inferior (total + botón de pago).
+    - tvFinalTotal       → texto con el total a pagar.
+    - btnGoToPayment     → botón "Realizar el Pago".
+    - overlay, topSheet  → soporte visual para el menú deslizante.
+  =============================================================
+-->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,6 +69,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- NUEVO: Botón "Volver al carrito" debajo del navbar, alineado a la izquierda -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBackToCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Volver al carrito"
+        android:textAllCaps="false"
+        android:layout_marginTop="@dimen/spacing_md"
+        app:layout_constraintTop_toBottomOf="@id/navbar"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <!-- SCROLL GENERAL DEL CHECKOUT -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollCheckout"
@@ -22,7 +87,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         android:layout_marginTop="@dimen/spacing_md"
-        app:layout_constraintTop_toBottomOf="@id/navbar"
+        app:layout_constraintTop_toBottomOf="@id/btnBackToCart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomBar">
@@ -32,10 +97,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- SECCIÓN DE ENVÍOS -->
+            <!-- SECCIÓN DE ENVÍOS (formulario incluido) -->
             <include
                 android:id="@+id/includeShipping"
-                layout="@layout/include_shipping_form"/>
+                layout="@layout/include_shipping_form" />
 
             <View
                 android:layout_width="match_parent"
@@ -51,7 +116,7 @@
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="@color/brand_brown"
-                android:layout_marginBottom="@dimen/spacing_sm"/>
+                android:layout_marginBottom="@dimen/spacing_sm" />
 
             <LinearLayout
                 android:id="@+id/llDetailProducts"
@@ -70,7 +135,6 @@
         android:orientation="vertical"
         android:background="@color/brand_background"
         android:padding="@dimen/spacing_md"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -82,7 +146,7 @@
             android:text="Total: $0"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="@color/brand_text_primary"/>
+            android:textColor="@color/brand_text_primary" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGoToPayment"
@@ -90,10 +154,11 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/brand_brown"
             android:layout_marginTop="@dimen/spacing_sm"
-            android:text="Realizar el Pago"/>
+            android:text="Realizar el Pago" />
 
     </LinearLayout>
 
+    <!-- Overlay para oscurecer fondo cuando se abre el top-sheet -->
     <View
         android:id="@+id/overlay"
         android:layout_width="0dp"
@@ -105,7 +170,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ===== Menú deslizante desde arriba (Top Sheet / se activa tocando el NavBar) ===== -->
+    <!-- Menú deslizante desde arriba (Top Sheet / se activa tocando el NavBar) -->
     <include
         android:id="@+id/topSheet"
         layout="@layout/layout_top_sheet_menu"

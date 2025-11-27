@@ -160,9 +160,7 @@ public class LoginActivity extends AppCompatActivity {
                             ? etEmail.getText().toString().trim()
                             : "";
 
-                    // ------------------------------------------------------------------
-                    // NUEVO: Poblar UserStore con datos básicos del usuario autenticado
-                    // ------------------------------------------------------------------
+
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                     String uid = "";
                     String emailFinal = emailFromField;
@@ -174,8 +172,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
 
-                    // Por ahora no tenemos el nombre desde Auth, lo dejamos vacío
-                    // y el usuario puede completarlo en la vista Profile.
+
                     UserStore.get().setBasicData(uid, "", emailFinal);
 
                     Toast.makeText(LoginActivity.this,
@@ -250,7 +247,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("email", email);
         startActivity(intent);
 
-        // Cerrar la pantalla de login para que no se pueda volver atrás fácilmente
+
         finish();
     }
 }

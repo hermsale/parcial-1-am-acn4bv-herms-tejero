@@ -36,10 +36,6 @@ import java.util.List;
  *         delega en él todas las operaciones (+, -, eliminar,
  *         vaciar).
  *
- * Beneficios:
- *   - Separa la lógica de negocio/estado (ViewModel + CartStore)
- *     de la lógica de UI (CartActivity).
- *   - Facilita pruebas unitarias del comportamiento del carrito.
  * ============================================================
  */
 public class CartViewModel extends ViewModel {

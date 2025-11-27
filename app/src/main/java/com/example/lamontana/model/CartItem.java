@@ -29,7 +29,6 @@ package com.example.lamontana.model;
  *       * Los botones +, -, o Subir PDF modifican su qty.
  *
  * Notas:
- *   - Es una clase de datos (modelo) sin dependencias de UI.
  *   - La validación en el constructor previene estados inválidos.
  * ============================================================
  */

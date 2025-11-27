@@ -120,7 +120,7 @@ public class ProfileViewModel extends ViewModel {
         userStore.nombre = (nombre != null) ? nombre : "";
         userStore.setOptionalData(apellido, telefono, direccion);
 
-        // 3) Sincronizar con Firestore usando tu método real updateUserProfile(...)
+        // 3) Sincronizar con Firestore usando el método  updateUserProfile(...)
         userRepository
                 .updateUserProfile(
                         uid,

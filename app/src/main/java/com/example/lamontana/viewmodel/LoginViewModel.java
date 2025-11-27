@@ -63,11 +63,6 @@ public class LoginViewModel extends ViewModel {
 
     /**
      * Inicia el proceso de login con email y contraseña.
-     *
-     * Notas:
-     *   - Se asume que la Activity ya hizo validaciones básicas de campos vacíos.
-     *   - Actualiza loading, loginSuccess y errorMessage según el resultado.
-     *
      * @param email    Email del usuario.
      * @param password Contraseña del usuario.
      */
@@ -93,7 +88,7 @@ public class LoginViewModel extends ViewModel {
                             String message = "Error al iniciar sesión";
                             if (task.getException() != null &&
                                     task.getException().getMessage() != null) {
-                                // Opcional: podríamos mapear mensajes de Firebase
+
                                 message = task.getException().getMessage();
                             }
 

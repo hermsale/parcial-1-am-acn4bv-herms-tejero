@@ -49,8 +49,7 @@ import java.util.List;
  */
 public class CatalogViewModel extends ViewModel {
 
-    // Nombre REAL de la colección en Firestore según colecciones-db.txt:
-    // "productos": [{ id, nombre, descripcion, tipo, precio, disponible, imagenes[] }]
+
     private static final String COLLECTION_PRODUCTS = "productos";
 
     // LiveData con la lista de productos del catálogo
@@ -65,7 +64,7 @@ public class CatalogViewModel extends ViewModel {
     private final MutableLiveData<String> errorLiveData =
             new MutableLiveData<>(null);
 
-    // Instancia de Firestore (usa la config global donde ya activaste persistencia offline)
+    // Instancia de Firestore
     private final FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
     // Flag para evitar recargas innecesarias si ya tenemos datos
@@ -106,7 +105,6 @@ public class CatalogViewModel extends ViewModel {
 
     /**
      * Fuerza una recarga desde Firestore (ignorando cache en memoria del ViewModel).
-     * Útil si más adelante agregás un botón de "recargar" o "pull to refresh".
      */
     public void reloadProducts() {
         hasLoadedOnce = false;
@@ -119,7 +117,7 @@ public class CatalogViewModel extends ViewModel {
 
     private void loadProductsInternal() {
         loadingLiveData.setValue(true);
-        errorLiveData.setValue(null);  // limpiamos error previo
+        errorLiveData.setValue(null);
 
         firestore.collection(COLLECTION_PRODUCTS)
                 .get()
@@ -155,12 +153,12 @@ public class CatalogViewModel extends ViewModel {
             return null;
         }
 
-        // Campos reales según colecciones-db.txt para "productos":
+
         String nombre = doc.getString("nombre");
         String descripcion = doc.getString("descripcion");
         String tipo = doc.getString("tipo");
 
-        // --------- Lectura de precio sin usar Number.class ---------
+
         int precio = 0;
 
         Long precioLong = doc.getLong("precio");
@@ -185,14 +183,8 @@ public class CatalogViewModel extends ViewModel {
         }
 
         // ============================
-        // NUEVO: leer campo "imagenes"
+        // leer campo "imagenes"
         // ============================
-        // En tu base:
-        //   "imagenes": [
-        //      "https://firebasestorage.googleapis.com/..."   (posición 0)
-        //   ]
-        //
-        // Tomamos el primer elemento como imageUrl.
         String imagenUrl = null;
         Object rawImagenes = doc.get("imagenes");
         if (rawImagenes instanceof List) {
@@ -203,7 +195,7 @@ public class CatalogViewModel extends ViewModel {
             }
         }
 
-        // Mapeamos el campo "tipo" a tu enum Category (PRINT / BINDING).
+        // Mapeamos el campo "tipo" al enum Category (PRINT / BINDING).
         Category category = mapCategoryFromTipo(tipo);
 
         // imageRes se sigue usando como fallback/local.
@@ -220,7 +212,7 @@ public class CatalogViewModel extends ViewModel {
                 category,
                 imageRes,
                 copyBased,
-                imagenUrl   // <-- ahora viene del array "imagenes"
+                imagenUrl
         );
     }
 
@@ -234,7 +226,7 @@ public class CatalogViewModel extends ViewModel {
 
         String value = tipo.trim().toLowerCase();
 
-        // Heurísticas simples: podés ajustarlas a tus tipos reales
+
         if (value.contains("anill") || value.contains("encuad") || value.contains("tapa dura")) {
             return Category.BINDING;
         }
@@ -245,7 +237,6 @@ public class CatalogViewModel extends ViewModel {
 
     /**
      * Asigna un drawable de ejemplo según la categoría y/o nombre del producto.
-     * Por ahora seguimos usando los drawables locales de la app:
      *   - sample_binding
      *   - sample_print_color
      *   - sample_print_bw

@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  =============================================================
+  Archivo: include_shipping_form.xml
+  Ubicación: res/layout/
+
+  ¿De qué se encarga este layout?
+    - Define el formulario de datos de envío que se incluye
+      dentro de la pantalla de Checkout (activity_cart_detail).
+    - Contiene:
+        · Título de sección ("Envíos").
+        · Subtítulo aclarando que CABA y GBA tienen envío gratis.
+        · CheckBox "Usar mi dirección guardada" para rellenar
+          automáticamente la dirección/telefono desde la base
+          de datos del usuario.
+        · Campos de entrada:
+            - Dirección (etAddress)
+            - Código Postal (etPostalCode)
+            - Teléfono de contacto (etPhone)
+            - Notas sobre el envío (etNotes)
+        · Botón para calcular el envío (btnCalculateShipping).
+
+  Relación con clases Java:
+    - CheckoutActivity:
+        · Hace findViewById(...) sobre:
+            - cbUseSavedAddress
+            - etAddress
+            - etPostalCode
+            - etPhone
+            - etNotes
+            - btnCalculateShipping
+        · Conecta el checkbox con CheckoutViewModel/UserStore
+          para autocompletar la dirección del usuario.
+  =============================================================
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -18,6 +52,16 @@
         android:text="Envíos gratis dentro de CABA y GBA."
         android:layout_width="match_parent"
         android:layout_height="48dp"/>
+
+
+    <CheckBox
+        android:id="@+id/cbUseSavedAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usar mi dirección guardada"
+        android:textColor="@color/brand_text_primary"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:layout_marginBottom="@dimen/spacing_sm"/>
 
     <EditText
         android:id="@+id/etAddress"

@@ -53,8 +53,7 @@ import java.util.Map;
 //       No pisa creadoEn ni passwordHash.
 //
 // Notas:
-//   - Firestore se obtiene vía FirebaseFirestore.getInstance(), ya configurado
-//     previamente en LaMontanaApp con persistencia offline.
+//   - Firestore se obtiene vía FirebaseFirestore.getInstance(),
 //   - Se usa SetOptions.merge() para no pisar campos existentes si el documento
 //     ya existía.
 // -----------------------------------------------------------------------------
@@ -119,9 +118,7 @@ public class UserRepository {
         data.put("telefono", "");          // sin teléfono al momento de signup
         data.put("direccion", "");         // sin dirección al momento de signup
 
-        // Campo de compatibilidad con el esquema legado.
-        // La autenticación real la maneja FirebaseAuth, por lo que no guardamos
-        // aquí un hash real de contraseña.
+
         data.put("passwordHash", "");
 
         // Campos de auditoría: timestamps de servidor

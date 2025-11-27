@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  =============================================================
+  Archivo: item_product_checkout.xml
+  Ubicación: res/layout/
+
+  ¿De qué se encarga este layout?
+    - Representa una tarjeta/ítem individual dentro del listado
+      de productos en la pantalla de Checkout.
+    - Muestra:
+        · Nombre del producto.
+        · Cantidad seleccionada en el carrito.
+        · Subtotal (cantidad * precio unitario).
+
+  Relación con clases Java:
+    - CheckoutActivity:
+        · Infla este layout por cada CartItem dentro de
+          llDetailProducts.
+        · Vincula:
+            - tvCheckoutName  → item.product.name
+            - tvCheckoutQty   → "Cantidad: X"
+            - tvCheckoutTotal → "Subtotal: $YYY"
+
+  Vistas importantes:
+    - TextView tvCheckoutName  → nombre del producto.
+    - TextView tvCheckoutQty   → cantidad de unidades.
+    - TextView tvCheckoutTotal → subtotal en ARS.
+  =============================================================
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -21,7 +49,7 @@
         android:layout_height="wrap_content"
         android:text="Cantidad: 1"
         android:textColor="@color/brand_text_primary"
-        android:layout_marginTop="4dp"/>
+        android:layout_marginTop="4dp" />
 
     <TextView
         android:id="@+id/tvCheckoutTotal"
