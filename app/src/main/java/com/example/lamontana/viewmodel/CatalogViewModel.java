@@ -30,27 +30,21 @@ import java.util.List;
  *     mediante LiveData para que CatalogActivity observe
  *     y renderice la UI.
  *
- * Alcance:
- *   - Es utilizado por CatalogActivity (vista principal de
- *     catálogo luego del login).
+ * Campos relevantes en la colección "productos":
+ *   - nombre: string
+ *   - descripcion: string
+ *   - tipo: string
+ *   - precio: number
+ *   - disponible: boolean
+ *   - imagenes: array<string>  (primer elemento = URL de Storage)
  *
- * Métodos presentes:
- *   - getProducts(): LiveData<List<Product>>
- *   - getLoading(): LiveData<Boolean>
- *   - getErrorMessage(): LiveData<String>
- *   - loadProductsIfNeeded(): carga los productos una sola vez.
- *   - reloadProducts(): fuerza recarga desde Firestore.
- *   - mapDocumentToProduct(DocumentSnapshot): mapea un doc de
- *     la colección "productos" a un objeto Product.
- *
- * NOTA SOBRE IMÁGENES:
- *   - En tu Firestore, "productos" tiene un campo "imagenes"
- *     (array de String) con rutas/URLs.
- *   - Para el parcial vamos a seguir usando drawables locales
- *     (imageRes) y no cargamos aún URLs desde red.
- *   - Más adelante se puede extender el modelo Product para
- *     soportar URLs (Firebase Storage) si necesitás compartir
- *     imágenes con otros proyectos.
+ * Notas sobre imágenes:
+ *   - Leemos el campo "imagenes" como List<String>.
+ *   - Si la lista no está vacía, usamos el primer elemento como
+ *     imageUrl (URL https:// de Firebase Storage).
+ *   - Esa URL se guarda en Product.imageUrl.
+ *   - Si imageUrl es null, la UI puede seguir usando imageRes
+ *     (drawables locales) como fallback.
  * ============================================================
  */
 public class CatalogViewModel extends ViewModel {
@@ -162,20 +156,22 @@ public class CatalogViewModel extends ViewModel {
         }
 
         // Campos reales según colecciones-db.txt para "productos":
-        //  - nombre: string
-        //  - descripcion: string
-        //  - tipo: string (ej: "libro", "cuaderno", etc.)
-        //  - precio: number
-        //  - disponible: boolean
-        //  - imagenes: array<string> (por ahora no lo usamos en la app nativa)
-
         String nombre = doc.getString("nombre");
         String descripcion = doc.getString("descripcion");
         String tipo = doc.getString("tipo");
 
-        // Leemos el precio como Number para soportar int/double
-        Number precioNumber = doc.get("precio", Number.class);
-        int precio = (precioNumber != null) ? precioNumber.intValue() : 0;
+        // --------- Lectura de precio sin usar Number.class ---------
+        int precio = 0;
+
+        Long precioLong = doc.getLong("precio");
+        if (precioLong != null) {
+            precio = precioLong.intValue();
+        } else {
+            Double precioDouble = doc.getDouble("precio");
+            if (precioDouble != null) {
+                precio = (int) Math.round(precioDouble);
+            }
+        }
 
         Boolean disponible = doc.getBoolean("disponible");
         if (disponible != null && !disponible) {
@@ -188,31 +184,43 @@ public class CatalogViewModel extends ViewModel {
             return null;
         }
 
+        // ============================
+        // NUEVO: leer campo "imagenes"
+        // ============================
+        // En tu base:
+        //   "imagenes": [
+        //      "https://firebasestorage.googleapis.com/..."   (posición 0)
+        //   ]
+        //
+        // Tomamos el primer elemento como imageUrl.
+        String imagenUrl = null;
+        Object rawImagenes = doc.get("imagenes");
+        if (rawImagenes instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<String> imagenes = (List<String>) rawImagenes;
+            if (imagenes != null && !imagenes.isEmpty()) {
+                imagenUrl = imagenes.get(0);
+            }
+        }
+
         // Mapeamos el campo "tipo" a tu enum Category (PRINT / BINDING).
         Category category = mapCategoryFromTipo(tipo);
 
-        // NOTA SOBRE IMÁGENES:
-        //   Aquí podríamos leer el campo "imagenes" (lista de rutas/URLs).
-        //   De momento lo ignoramos y elegimos un drawable local de ejemplo.
+        // imageRes se sigue usando como fallback/local.
         int imageRes = mapImageRes(category, nombre);
 
         // El último parámetro (copyBased) lo fijamos true por defecto para productos
-        // que se cobran "por unidad/copia". Si más adelante querés que dependa de Firestore,
-        // podés agregar un campo específico.
+        // que se cobran "por unidad/copia".
         boolean copyBased = true;
 
-        // Respetamos las validaciones del constructor Product:
-        // - nombre no nulo/ vacío
-        // - descripcion no nula (en caso de null, usamos "").
-        // - precio >= 0
-        // - category no nula
         return new Product(
                 nombre,
                 descripcion != null ? descripcion : "",
                 precio,
                 category,
                 imageRes,
-                copyBased
+                copyBased,
+                imagenUrl   // <-- ahora viene del array "imagenes"
         );
     }
 

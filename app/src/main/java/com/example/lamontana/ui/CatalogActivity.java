@@ -8,14 +8,18 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.example.lamontana.R;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.Category;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.viewmodel.CatalogViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,44 +31,60 @@ import java.util.Locale;
 
 /*
  * ============================================================
- * Archivo: MainActivity.java
- * Paquete: com.example.lamontana
+ * Archivo: CatalogActivity.java
+ * Paquete: com.example.lamontana.ui
  *
  * ¿De qué se encarga este archivo?
- *  - Implementa la pantalla principal de Catálogo de la app "La Montaña".
- *  - Muestra productos/servicios, permite filtrarlos y agregarlos al carrito.
- *  - Presenta, en el panel superior, un resumen rápido del carrito (cantidad y total).
+ *  - Implementa la pantalla principal de Catálogo de la app
+ *    "La Montaña".
+ *  - Muestra productos/servicios traídos desde Firestore,
+ *    permite filtrarlos y agregarlos al carrito.
+ *  - Presenta, en el panel superior, un resumen rápido del
+ *    carrito (cantidad y total).
  *  - Verifica que el usuario esté logueado con Firebase Auth
  *    antes de mostrar el catálogo.
- *  - Controla el menú deslizante del navbar (top sheet) con opciones:
+ *  - Controla el menú deslizante del navbar (top sheet) con
+ *    opciones:
  *      · Mis datos
  *      · Mi carrito
  *      · Cerrar sesión
  *
- * Clases declaradas:
- *  - MainActivity: Activity concreta (AppCompatActivity) que actúa como
- *    pantalla de Catálogo protegida para usuarios autenticados.
+ * Relación con otras clases:
+ *  - CatalogViewModel:
+ *      * Carga los productos desde Firestore (colección
+ *        "productos") y expone List<Product> por LiveData.
+ *  - Product:
+ *      * Incluye tanto imageRes (drawable local) como imageUrl
+ *        (URL remota de Firebase Storage).
+ *  - CartStore / CartActivity:
+ *      * Reciben los Product seleccionados y gestionan el
+ *        estado del carrito.
  *
  * Métodos presentes:
  *  - onCreate(Bundle):
  *      * Verifica login (ensureUserLoggedIn()).
  *      * Infla el layout, inicializa vistas y listeners.
  *      * Configura el menú deslizante del navbar.
- *      * Carga datos de ejemplo (seedMockData) y renderiza catálogo.
+ *      * Conecta el CatalogViewModel y observa los productos.
  *  - ensureUserLoggedIn():
- *      * Consulta FirebaseAuth para ver si hay usuario autenticado.
- *  - seedMockData():
- *      * Crea productos de ejemplo para la demo.
+ *      * Consulta FirebaseAuth para ver si hay usuario
+ *        autenticado.
  *  - renderCatalog(List<Product>):
- *      * Dibuja la lista de productos y vincula el botón "Agregar".
+ *      * Dibuja la lista de productos en item_catalog.xml,
+ *        usando Glide con imageUrl si está disponible, o
+ *        imageRes como fallback.
  *  - filterAndRender(Category):
- *      * Aplica un filtro por categoría y vuelve a renderizar.
+ *      * Aplica un filtro por categoría sobre la lista
+ *        completa cargada desde el ViewModel.
  *  - updateCartUi():
- *      * Actualiza el panel superior del carrito (cantidad y total).
+ *      * Actualiza el panel superior del carrito (cantidad y
+ *        total).
  *  - toggleMenu(), openMenu(), closeMenu():
- *      * Controlan la apertura/cierre del menú deslizante del navbar.
+ *      * Controlan la apertura/cierre del menú deslizante del
+ *        navbar.
  *  - onResume():
- *      * Refresca el estado del carrito al volver a esta pantalla.
+ *      * Refresca el estado del carrito al volver a esta
+ *        pantalla.
  * ============================================================
  */
 
@@ -84,10 +104,15 @@ public class CatalogActivity extends AppCompatActivity {
     private boolean isMenuOpen = false;
 
     // ---------- Soporte ----------
-    private final List<Product> allProducts = new ArrayList<>();
+    /** Lista completa de productos cargados desde Firestore vía ViewModel. */
+    private final List<Product> fullProductList = new ArrayList<>();
+
     private LayoutInflater inflater;
     private final NumberFormat ars =
             NumberFormat.getCurrencyInstance(new Locale("es", "AR"));
+
+    /** ViewModel responsable de cargar los productos desde Firestore. */
+    private CatalogViewModel catalogViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -157,13 +182,35 @@ public class CatalogActivity extends AppCompatActivity {
         btnClearCart = findViewById(R.id.btnClearCart);
         btnViewCart = findViewById(R.id.btnViewCart);
 
-        // Datos de ejemplo y primer render del catálogo
-        seedMockData();
-        renderCatalog(allProducts);
+        // ---------- Inicializar ViewModel y observar datos ----------
+        catalogViewModel = new ViewModelProvider(this).get(CatalogViewModel.class);
+
+        // Observamos la lista de productos: cuando cambie, actualizamos la lista local y renderizamos.
+        catalogViewModel.getProducts().observe(this, products -> {
+            fullProductList.clear();
+            if (products != null) {
+                fullProductList.addAll(products);
+            }
+            // Renderizamos la lista completa por defecto
+            renderCatalog(fullProductList);
+        });
+
+        // Observamos errores para mostrar un mensaje simple al usuario.
+        catalogViewModel.getErrorMessage().observe(this, msg -> {
+            if (msg != null && !msg.trim().isEmpty()) {
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Si quisieras observar un estado de carga, aquí podrías mostrar/ocultar un spinner.
+        // catalogViewModel.getLoading().observe(this, isLoading -> { ... });
+
+        // Disparar la carga de productos sólo si es necesario
+        catalogViewModel.loadProductsIfNeeded();
 
         // ---------- Listeners de filtros y acciones de carrito ----------
         if (btnAll != null) {
-            btnAll.setOnClickListener(v -> renderCatalog(allProducts));
+            btnAll.setOnClickListener(v -> renderCatalog(fullProductList));
         }
         if (btnPrint != null) {
             btnPrint.setOnClickListener(v -> filterAndRender(Category.PRINT));
@@ -211,25 +258,9 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
     /**
-     * Crea productos de ejemplo para la demostración.
-     */
-    private void seedMockData() {
-        allProducts.add(new Product(
-                "Impresión B/N", "Cara simple · A4", 100,
-                Category.PRINT, R.drawable.sample_print_bw, /*copyBased*/ true
-        ));
-        allProducts.add(new Product(
-                "Impresión color", "Doble cara · A4", 200,
-                Category.PRINT, R.drawable.sample_print_color, /*copyBased*/ true
-        ));
-        allProducts.add(new Product(
-                "Anillado A4", "Tapa plástica + contratapa", 800,
-                Category.BINDING, R.drawable.sample_binding, /*copyBased*/ false
-        ));
-    }
-
-    /**
      * Renderiza la lista de productos (catálogo) en el contenedor vertical.
+     * Usa Glide para cargar imageUrl de Firebase Storage si está disponible;
+     * en caso contrario, recurre al drawable local imageRes.
      */
     private void renderCatalog(List<Product> list) {
         if (llCatalogContainer == null) return;
@@ -246,10 +277,23 @@ public class CatalogActivity extends AppCompatActivity {
             TextView tvPrice = item.findViewById(R.id.tvPrice);
             MaterialButton btnAdd = item.findViewById(R.id.btnAdd);
 
-            if (iv != null) iv.setImageResource(p.imageRes);
             if (tvName != null) tvName.setText(p.name);
             if (tvDesc != null) tvDesc.setText(p.desc);
             if (tvPrice != null) tvPrice.setText(ars.format(p.price));
+
+            if (iv != null) {
+                if (p.imageUrl != null) {
+                    // Imagen remota desde Firebase Storage
+                    Glide.with(iv.getContext())
+                            .load(p.imageUrl)
+                            .placeholder(p.imageRes != 0 ? p.imageRes : R.drawable.sample_print_bw)
+                            .error(p.imageRes != 0 ? p.imageRes : R.drawable.sample_print_bw)
+                            .into(iv);
+                } else {
+                    // Fallback: drawable local
+                    iv.setImageResource(p.imageRes);
+                }
+            }
 
             if (btnAdd != null) {
                 btnAdd.setOnClickListener(v -> {
@@ -267,7 +311,7 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void filterAndRender(Category category) {
         List<Product> filtered = new ArrayList<>();
-        for (Product p : allProducts) {
+        for (Product p : fullProductList) {
             if (p.category == category) filtered.add(p);
         }
         renderCatalog(filtered);
