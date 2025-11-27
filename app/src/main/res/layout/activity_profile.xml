@@ -89,14 +89,21 @@
                 android:padding="12dp"
                 android:layout_marginTop="10dp"/>
 
+            <!--
+                Botón de acción para iniciar el flujo de cambio de contraseña.
+                - Visual: usa el naranja de marca (brand_orange), igual que botones
+                  de acción como "Agregar" en el catálogo.
+                - Lógica: al hacer click, ProfileActivity delega en
+                  ModificarContrasenaHelper.mostrarDialogoCambioContrasena(...).
+            -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Cambiar contraseña"
                 android:layout_marginTop="24dp"
-                android:backgroundTint="@color/brand_brown"
-                android:textColor="@android:color/white"/>
+                android:backgroundTint="@color/brand_orange"
+                android:textColor="@color/brand_text_on_primary"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
