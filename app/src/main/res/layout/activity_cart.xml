@@ -69,42 +69,71 @@
         Muestra el total acumulado del carrito.
         Se actualiza dinámicamente desde CartActivity.updateTotal().
     -->
-    <TextView
-        android:id="@+id/tvCartGrandTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Total: $ 0"
-        android:textStyle="bold"
-        android:textColor="@color/brand_text_primary"
-        android:layout_marginTop="@dimen/spacing_sm"
-        app:layout_constraintTop_toBottomOf="@id/navbar"
-        app:layout_constraintEnd_toEndOf="parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/tvCartGrandTotal"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Total: $ 0"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textColor="@color/brand_text_primary"-->
+<!--        android:layout_marginTop="@dimen/spacing_sm"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/navbar"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
     <!--
         Crea una barrera virtual para alinear el contenido inferior del encabezado,
         de modo que los botones y textos queden correctamente espaciados.
     -->
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrierHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="btnBackToCatalog,btnPlaceAllOrders" />
+<!--    <androidx.constraintlayout.widget.Barrier-->
+<!--        android:id="@+id/barrierHeader"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:barrierDirection="bottom"-->
+<!--        app:constraint_referenced_ids="btnBackToCatalog,btnPlaceAllOrders" />-->
 
     <!--
         Botón que permite realizar todos los pedidos del carrito.
         En esta versión de prueba, solo simula la acción.
     -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnPlaceAllOrders"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/place_all_orders"
-        android:backgroundTint="@color/brand_green"
-        android:layout_marginTop="@dimen/spacing_xs"
-        app:layout_constraintTop_toBottomOf="@id/tvCartGrandTotal"
-        app:layout_constraintEnd_toEndOf="parent" />
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/btnPlaceAllOrders"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/place_all_orders"-->
+<!--        android:backgroundTint="@color/brand_green"-->
+<!--        android:layout_marginTop="@dimen/spacing_xs"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tvCartGrandTotal"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
+    <!-- NUEVA BARRA DE ACCIONES FIJA ABAJO -->
+    <LinearLayout
+        android:id="@+id/bottomActionBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md"
+        android:background="@color/brand_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/includeFooter">
+
+        <TextView
+            android:id="@+id/tvCartGrandTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: $ 0"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/brand_text_primary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPlaceAllOrders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/place_all_orders"
+            android:backgroundTint="@color/brand_green"
+            android:layout_marginTop="@dimen/spacing_sm" />
+    </LinearLayout>
     <!--
         Contenedor inferior reutilizable que incluye datos de contacto,
         branding y posibles enlaces institucionales.
@@ -129,8 +158,8 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         android:layout_marginTop="@dimen/spacing_sm"
-        app:layout_constraintTop_toBottomOf="@id/barrierHeader"
-        app:layout_constraintBottom_toTopOf="@id/includeFooter"
+        app:layout_constraintTop_toBottomOf="@id/btnBackToCatalog"
+        app:layout_constraintBottom_toTopOf="@id/bottomActionBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
