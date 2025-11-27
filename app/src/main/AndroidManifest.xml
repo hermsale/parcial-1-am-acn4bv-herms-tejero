@@ -79,5 +79,8 @@
         <activity
             android:name=".ui.ProfileActivity"
             android:exported="false" />
+
+<!--        checkout despues de pulsar Realizar Pedido -->
+        <activity android:name=".ui.CheckoutActivity" />
     </application>
 </manifest>

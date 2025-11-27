@@ -16,6 +16,7 @@ import com.example.lamontana.R;
 import com.example.lamontana.data.CartStore;
 import com.example.lamontana.model.CartItem;
 import com.example.lamontana.model.Product;
+import com.example.lamontana.ui.navbar.MenuDesplegableHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -93,46 +94,79 @@ public class CartActivity extends AppCompatActivity {
 
         // ---------- Navbar / Menú deslizante ----------
         ImageView btnMenu = findViewById(R.id.btnMenu);
-        overlay = findViewById(R.id.overlay);
-        topSheet = findViewById(R.id.topSheet);
+        View overlay = findViewById(R.id.overlay);
+        View topSheet = findViewById(R.id.topSheet);
 
-        if (btnMenu != null) {
-            btnMenu.setOnClickListener(v -> toggleMenu());
-        }
-        if (overlay != null) {
-            overlay.setOnClickListener(v -> closeMenu());
-        }
-
-        // Botones dentro del top sheet
+        View btnInicio = findViewById(R.id.btnInicio);
         View btnMisDatos = findViewById(R.id.btnMisDatos);
         View btnMiCarrito = findViewById(R.id.btnMiCarrito);
         View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
 
-        if (btnMisDatos != null) {
-            btnMisDatos.setOnClickListener(v -> {
-                closeMenu();
-                startActivity(new Intent(CartActivity.this, ProfileActivity.class));
-            });
-        }
+// Usar el helper centralizado
+        MenuDesplegableHelper menuHelper =
+                new MenuDesplegableHelper(
+                        this,
+                        btnMenu,
+                        overlay,
+                        topSheet,
+                        btnInicio,
+                        btnMisDatos,
+                        btnMiCarrito,
+                        btnCerrarSesion
+                );
 
-        if (btnMiCarrito != null) {
-            btnMiCarrito.setOnClickListener(v -> {
-                closeMenu();
-                // Ya estás en Carrito; si querés simplemente refrescar:
-                renderCart();
-            });
-        }
+        menuHelper.initMenu();
 
-        if (btnCerrarSesion != null) {
-            btnCerrarSesion.setOnClickListener(v -> {
-                closeMenu();
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(CartActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            });
-        }
+        // ---------- Navbar / Menú deslizante ----------
+//        ImageView btnMenu = findViewById(R.id.btnMenu);
+//        overlay = findViewById(R.id.overlay);
+//        topSheet = findViewById(R.id.topSheet);
+//
+//        if (btnMenu != null) {
+//            btnMenu.setOnClickListener(v -> toggleMenu());
+//        }
+//        if (overlay != null) {
+//            overlay.setOnClickListener(v -> closeMenu());
+//        }
+
+        // Botones dentro del top sheet
+//        View btnInicio = findViewById(R.id.btnInicio);
+//        View btnMisDatos = findViewById(R.id.btnMisDatos);
+//        View btnMiCarrito = findViewById(R.id.btnMiCarrito);
+//        View btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+//
+//        if (btnInicio != null) {
+//            btnInicio.setOnClickListener(v -> {
+//                closeMenu();
+//                startActivity(new Intent(CartActivity.this, CatalogActivity.class));
+//            });
+//        }
+//
+//        if (btnMisDatos != null) {
+//            btnMisDatos.setOnClickListener(v -> {
+//                closeMenu();
+//                startActivity(new Intent(CartActivity.this, ProfileActivity.class));
+//            });
+//        }
+//
+//        if (btnMiCarrito != null) {
+//            btnMiCarrito.setOnClickListener(v -> {
+//                closeMenu();
+//                // Ya estás en Carrito; si querés simplemente refrescar:
+//                renderCart();
+//            });
+//        }
+//
+//        if (btnCerrarSesion != null) {
+//            btnCerrarSesion.setOnClickListener(v -> {
+//                closeMenu();
+//                FirebaseAuth.getInstance().signOut();
+//                Intent intent = new Intent(CartActivity.this, LoginActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+//                finish();
+//            });
+//        }
 
         // ---- Referencias de UI del carrito ----
         llCartListContainer = findViewById(R.id.llCartListContainer);
@@ -144,10 +178,16 @@ public class CartActivity extends AppCompatActivity {
             btnBack.setOnClickListener(v -> finish());
         }
 
-        MaterialButton btnPlaceAll = findViewById(R.id.btnPlaceAllOrders);
-        if (btnPlaceAll != null) {
-            btnPlaceAll.setOnClickListener(v -> onPlaceAllOrders());
-        }
+//modificamos el comportamiento del btnPlaceAll para que envie a la vista de Checkout
+     MaterialButton btnPlaceAll = findViewById(R.id.btnPlaceAllOrders);
+//        if (btnPlaceAll != null) {
+//            btnPlaceAll.setOnClickListener(v -> onPlaceAllOrders());
+//        }
+
+        btnPlaceAll.setOnClickListener(v -> {
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            startActivity(intent);
+        });
 
         // Primer render de la lista
         renderCart();
@@ -291,32 +331,32 @@ public class CartActivity extends AppCompatActivity {
     /**
      * Acción “Realizar todos los pedidos”.
      */
-    private void onPlaceAllOrders() {
-        int items = CartStore.get().getTotalQty();
-        int total = CartStore.get().getTotalAmount();
-        if (items <= 0) return;
-
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.confirm_all_orders_title))
-                .setMessage(
-                        getString(
-                                R.string.confirm_all_orders_msg,
-                                items,
-                                ars.format(total)
-                        )
-                )
-                .setPositiveButton(getString(R.string.ok), (d, w) -> {
-                    new AlertDialog.Builder(this)
-                            .setMessage(getString(R.string.all_orders_done))
-                            .setPositiveButton(getString(R.string.ok), (d2, w2) -> {
-                                CartStore.get().clear();
-                                renderCart();
-                            })
-                            .show();
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
-    }
+//    private void onPlaceAllOrders() {
+//        int items = CartStore.get().getTotalQty();
+//        int total = CartStore.get().getTotalAmount();
+//        if (items <= 0) return;
+//
+//        new AlertDialog.Builder(this)
+//                .setTitle(getString(R.string.confirm_all_orders_title))
+//                .setMessage(
+//                        getString(
+//                                R.string.confirm_all_orders_msg,
+//                                items,
+//                                ars.format(total)
+//                        )
+//                )
+//                .setPositiveButton(getString(R.string.ok), (d, w) -> {
+//                    new AlertDialog.Builder(this)
+//                            .setMessage(getString(R.string.all_orders_done))
+//                            .setPositiveButton(getString(R.string.ok), (d2, w2) -> {
+//                                CartStore.get().clear();
+//                                renderCart();
+//                            })
+//                            .show();
+//                })
+//                .setNegativeButton(getString(R.string.cancel), null)
+//                .show();
+//    }
 
     /**
      * Busca un CartItem actual por el nombre del producto.

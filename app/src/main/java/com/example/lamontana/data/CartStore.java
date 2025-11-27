@@ -72,6 +72,12 @@ public class CartStore {
         return INSTANCE;
     }
 
+//    public static Object getInstance() {
+//        return null;
+//    }
+
+
+
     // ------------------------------
     // Lecturas
     // ------------------------------

@@ -79,4 +79,20 @@ public class Product {
                 ", imageUrl=" + imageUrl +
                 "}";
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
 }
