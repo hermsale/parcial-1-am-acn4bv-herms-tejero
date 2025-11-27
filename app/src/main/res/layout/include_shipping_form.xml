@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_card"
+    android:padding="@dimen/spacing_md">
+
+    <TextView
+        style="@style/SectionTitle"
+        android:text="Envíos"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+    <TextView
+        style="@style/SectionSubtitle"
+        android:text="Envíos gratis dentro de CABA y GBA."
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+    <EditText
+        android:id="@+id/etAddress"
+        style="@style/CheckoutInputStyle"
+        android:hint="Dirección"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+    <EditText
+        android:id="@+id/etPostalCode"
+        style="@style/CheckoutInputStyle"
+        android:hint="Código Postal"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+    <EditText
+        android:id="@+id/etPhone"
+        style="@style/CheckoutInputStyle"
+        android:hint="Teléfono de contacto"
+        android:inputType="phone"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+    <EditText
+        android:id="@+id/etNotes"
+        style="@style/CheckoutInputStyle"
+        android:hint="Notas sobre el envío (opcional)"
+        android:minLines="3"
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCalculateShipping"
+        style="@style/CheckoutPrimaryButton"
+        android:text="Calcular envío"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"/>
+
+</LinearLayout>

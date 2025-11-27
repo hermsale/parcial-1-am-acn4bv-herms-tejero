@@ -111,4 +111,33 @@
     <string name="footer_tiktok">TikTok</string>
     <string name="footer_rights">© 2025 La Montaña — Todos los derechos reservados.</string>
 
+
+<!--    cart detail -->
+    <!-- Título de secciones (Checkout, Envíos, etc.) -->
+    <style name="SectionTitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/brand_brown_dark</item>
+        <item name="android:layout_marginBottom">12dp</item>
+    </style>
+
+    <!-- Texto secundario de secciones -->
+    <style name="SectionSubtitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/brand_text_primary</item>
+        <item name="android:layout_marginBottom">12dp</item>
+    </style>
+
+    <!-- Inputs generales del checkout -->
+    <style name="CheckoutInputStyle" parent="LoginInputStyle">
+        <!-- LoginInputStyle ya tiene padding, fondo y margenes -->
+        <item name="android:textColor">@color/brand_text_primary</item>
+    </style>
+
+    <!-- Botón principal del checkout: Calcular envío / Realizar pago -->
+    <style name="CheckoutPrimaryButton" parent="LoginButtonStyle">
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+
 </resources>

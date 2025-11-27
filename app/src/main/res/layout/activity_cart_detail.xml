@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/brand_background"
+    android:padding="@dimen/spacing_md">
+
+    <!-- NAVBAR -->
+    <include
+        android:id="@+id/navbar"
+        layout="@layout/include_navbar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- SCROLL GENERAL DEL CHECKOUT -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollCheckout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="@dimen/spacing_md"
+        app:layout_constraintTop_toBottomOf="@id/navbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- SECCIÓN DE ENVÍOS -->
+            <include
+                android:id="@+id/includeShipping"
+                layout="@layout/include_shipping_form"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#33000000"
+                android:layout_marginVertical="@dimen/spacing_md" />
+
+            <!-- LISTA DE PRODUCTOS -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Productos"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="@color/brand_brown"
+                android:layout_marginBottom="@dimen/spacing_sm"/>
+
+            <LinearLayout
+                android:id="@+id/llDetailProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- BARRA FINAL DE PRECIOS + PAGO -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/brand_background"
+        android:padding="@dimen/spacing_md"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvFinalTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: $0"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/brand_text_primary"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoToPayment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/brand_brown"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="Realizar el Pago"/>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
