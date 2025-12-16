@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ =============================================================
+ Archivo: layout_top_sheet_menu.xml
+ Ubicación: app/src/main/res/layout/
+
+ ¿De qué se encarga este archivo?
+   - Define el menú desplegable (top sheet) que se abre desde el botón hamburguesa
+     del header en varias pantallas.
+   - Contiene accesos directos a secciones principales de la app.
+
+ Alcance:
+   - Solo UI (no contiene lógica).
+   - Los clicks se manejan desde MenuDesplegableHelper u otra clase que lo consuma.
+
+ “Elementos/IDs presentes” (equivalente a lista de funciones en XML):
+   - btnInicio
+   - btnMisDatos
+   - btnMiCarrito
+   - btnImpresionesCopias
+   - btnCerrarSesion
+ =============================================================
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/topSheet"
     android:layout_width="match_parent"
@@ -7,8 +29,7 @@
     android:background="@android:color/white"
     android:padding="20dp"
     android:elevation="10dp"
-    android:visibility="gone"
-  >
+    android:visibility="gone">
 
     <TextView
         android:id="@+id/btnInicio"
@@ -17,7 +38,6 @@
         android:text="Inicio"
         android:textSize="18sp"
         android:padding="12dp" />
-
 
     <TextView
         android:id="@+id/btnMisDatos"
@@ -32,6 +52,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Mi carrito"
+        android:textSize="18sp"
+        android:padding="12dp" />
+
+
+    <TextView
+        android:id="@+id/btnImpresionesCopias"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Impresiones y copias"
         android:textSize="18sp"
         android:padding="12dp" />
 
