@@ -3,6 +3,7 @@ package com.example.lamontana.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -57,6 +58,10 @@ public class CheckoutActivity extends AppCompatActivity {
     private LinearLayout llDetailProducts;
     private TextView tvFinalTotal;
 
+
+    // ---------- Servicios ----------
+    int total_servicio;
+
     // ---------- UI: formulario de envío ----------
     private CheckBox cbUseSavedAddress;
     private EditText etAddress;
@@ -103,7 +108,14 @@ public class CheckoutActivity extends AppCompatActivity {
         // 6) Render inicial del carrito
         inflater = LayoutInflater.from(this);
         renderCheckoutItems(CartStore.get().getItems());
+
+        //        verifico que llegue bien el monto
+        total_servicio = getIntent().getIntExtra("SERVICIO_TOTAL", 0);
+        Log.d("CHECKOUT", "Total recibido: " + total_servicio);
         updateTotalLabel();
+
+
+
     }
 
     // ----------------------------------------------------------
@@ -273,6 +285,10 @@ public class CheckoutActivity extends AppCompatActivity {
     // ----------------------------------------------------------
     private void updateTotalLabel() {
         int total = CartStore.get().getTotalAmount();
+
+        total_servicio = getIntent().getIntExtra("SERVICIO_TOTAL", 0);
+        total += total_servicio;
+
         if (tvFinalTotal != null) {
             tvFinalTotal.setText("Total: " + ars.format(total));
         }

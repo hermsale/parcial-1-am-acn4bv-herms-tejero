@@ -1,6 +1,7 @@
 package com.example.lamontana.ui;
 
 
+import android.content.Intent;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,14 +22,17 @@ public class ServiciosActivity extends AppCompatActivity {
     private MenuDesplegableHelper menuHelper;
 
     // Precios base
-    private static final double PRECIO_CARILLA = 1.0;
+    private static final double PRECIO_CARILLA = 10;
     private static final double PRECIO_BN = 40;
     private static final double PRECIO_COLOR = 120;
-    private static final double RECARGO_DOBLE_FAZ = 0.8;
+    private static final double RECARGO_DOBLE_FAZ = 15;
     private static final double PRECIO_ANILLADO = 900;
     private static final double PRECIO_ENCUADERNADO = 1500;
+    private int totalActual = 0;
+
 
 //
+    private TextView tvCartGrandTotal;
     TextView txtTotal;
     Button btnPagar;
 
@@ -72,7 +76,8 @@ public class ServiciosActivity extends AppCompatActivity {
             carillas = Integer.parseInt(edtCarillas.getText().toString());
         }
 
-        double total = 0;
+//        variable local para sumar todos los servicios
+        int total = 0;
 
         // Precio base por carilla
         total += carillas * PRECIO_CARILLA;
@@ -99,8 +104,13 @@ public class ServiciosActivity extends AppCompatActivity {
             total += PRECIO_ENCUADERNADO;
         }
 
+    //  totalActual almacena el total, es la variable que pasamos por intent a checkoutActivity
+        totalActual = total;
+
         txtTotal.setText("TOTAL: $" + total);
     }
+
+
 //             new Servicio("fotocopiado_bn",
 //                    "Fotocopiado en blanco y negro por carilla, simple faz.",
 //                    true, 40),
@@ -168,8 +178,19 @@ public class ServiciosActivity extends AppCompatActivity {
                 btnMiCarrito,
                 btnCerrarSesion
         );
+
         menuHelper.initMenu();
 
+//        Btn para realizar el pago. redirigir a CheckoutActivity
+        if (btnPagar != null){
+
+            btnPagar.setOnClickListener(v -> {
+                Intent intent = new Intent(ServiciosActivity.this, CheckoutActivity.class);
+                intent.putExtra("SERVICIO_TOTAL", totalActual);
+                startActivity(intent);
+            }
+            );
+        };
 
 
         // Selector de archivo
@@ -204,6 +225,7 @@ public class ServiciosActivity extends AppCompatActivity {
         );
 
 
+
 //      escucha de cambios
         edtCarillas.addTextChangedListener(new SimpleTextWatcher() {
             @Override
@@ -232,6 +254,7 @@ public class ServiciosActivity extends AppCompatActivity {
                 Arrays.asList("Efectivo", "Transferencia")
         );
         spMetodoPago.setAdapter(pagoAdapter);
+
 
 
     }
