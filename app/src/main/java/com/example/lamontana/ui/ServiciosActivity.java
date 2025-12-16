@@ -19,6 +19,20 @@ public class ServiciosActivity extends AppCompatActivity {
 
     // Helper para el menú desplegable del navbar
     private MenuDesplegableHelper menuHelper;
+
+    // Precios base
+    private static final double PRECIO_CARILLA = 1.0;
+    private static final double PRECIO_BN = 40;
+    private static final double PRECIO_COLOR = 120;
+    private static final double RECARGO_DOBLE_FAZ = 0.8;
+    private static final double PRECIO_ANILLADO = 900;
+    private static final double PRECIO_ENCUADERNADO = 1500;
+
+//
+    TextView txtTotal;
+    Button btnPagar;
+
+
     Button btnArchivo;
 
     TextView txtArchivo;
@@ -51,6 +65,62 @@ public class ServiciosActivity extends AppCompatActivity {
         }
     }
 
+    private void recalcularTotal() {
+
+        int carillas = 0;
+        if (!edtCarillas.getText().toString().isEmpty()) {
+            carillas = Integer.parseInt(edtCarillas.getText().toString());
+        }
+
+        double total = 0;
+
+        // Precio base por carilla
+        total += carillas * PRECIO_CARILLA;
+
+        // Blanco y negro o color
+        int modoSeleccionado = rgModo.getCheckedRadioButtonId();
+        if (modoSeleccionado == R.id.rbBN) {
+            total += carillas * PRECIO_BN;
+        } else if (modoSeleccionado == R.id.rbColor) {
+            total += carillas * PRECIO_COLOR;
+        }
+
+        // Doble faz (recargo por carilla)
+        if (chkDobleFaz.isChecked()) {
+            total += carillas * RECARGO_DOBLE_FAZ;
+        }
+
+        // Servicios adicionales
+        if (chkAnillado.isChecked()) {
+            total += PRECIO_ANILLADO;
+        }
+
+        if (chkEncuadernado.isChecked()) {
+            total += PRECIO_ENCUADERNADO;
+        }
+
+        txtTotal.setText("TOTAL: $" + total);
+    }
+//             new Servicio("fotocopiado_bn",
+//                    "Fotocopiado en blanco y negro por carilla, simple faz.",
+//                    true, 40),
+//
+//            new Servicio("fotocopiado_color",
+//                    "Fotocopiado/color por carilla, simple faz.",
+//                    true, 120),
+//
+//            new Servicio("doble_faz",
+//                    "Recargo o ajuste por impresión doble faz.",
+//                    true, 0.8),
+//
+//            new Servicio("anillado",
+//                    "Anillado plástico o metálico estándar.",
+//                    true, 900),
+//
+//            new Servicio("encuadernado",
+//                    "Encuadernado simple (tapa blanda).",
+//                    true, 1500)
+
     ActivityResultLauncher<String> seleccionarArchivo;
 
 
@@ -58,6 +128,10 @@ public class ServiciosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_servicios);
+
+//        seccion total y pagar
+        txtTotal = findViewById(R.id.txtTotal);
+        btnPagar = findViewById(R.id.btnPagar);
 
         // Referencias
         btnArchivo = findViewById(R.id.btnArchivo);
@@ -113,6 +187,7 @@ public class ServiciosActivity extends AppCompatActivity {
 
                         if (carillas > 0) {
                             edtCarillas.setText(String.valueOf(carillas));
+                            recalcularTotal();
                         } else {
                             edtCarillas.setText("0");
                         }
@@ -129,7 +204,18 @@ public class ServiciosActivity extends AppCompatActivity {
         );
 
 
+//      escucha de cambios
+        edtCarillas.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                recalcularTotal();
+            }
+        });
 
+        rgModo.setOnCheckedChangeListener((group, checkedId) -> recalcularTotal());
+        chkDobleFaz.setOnCheckedChangeListener((b, v) -> recalcularTotal());
+        chkAnillado.setOnCheckedChangeListener((b, v) -> recalcularTotal());
+        chkEncuadernado.setOnCheckedChangeListener((b, v) -> recalcularTotal());
 
         // Spinner tamaño hoja
         ArrayAdapter<String> paperAdapter = new ArrayAdapter<>(
